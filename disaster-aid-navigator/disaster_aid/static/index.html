@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disaster Aid Navigator</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --ink: #1a2332;
+      --muted: #5c6775;
+      --line: #e3d9c8;
+      --card: #fffcf7;
+      --teal: #0e4d5c;
+      --open: #146c43;
+      --open-bg: #e5f6ec;
+      --closed: #9a3412;
+      --closed-bg: #fde8dc;
+      --na: #3f4a57;
+      --na-bg: #e8edf1;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.45;
+      overflow: hidden;
+    }
+    .wrap {
+      max-width: 44rem;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .eyebrow {
+      margin: 0;
+      color: var(--teal);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0.2rem 0 0.35rem;
+      font-family: Georgia, "Iowan Old Style", Palatino, serif;
+      font-size: 2.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .lede { margin: 0; font-size: 1.05rem; }
+    .mode {
+      margin: 1rem 0 0;
+      padding: 0.65rem 0.8rem;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 0.6rem;
+      font-size: 0.92rem;
+    }
+    .mode.sample { background: #fff6e8; border-color: #f0d7a8; }
+    header { flex: none; }
+    main {
+      flex: 1;
+      min-height: 0;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    h2.sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    #transcript {
+      list-style: none;
+      margin: 0;
+      padding: 0 0.15rem 0.4rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    #transcript p { margin: 0; }
+    .user {
+      align-self: flex-end;
+      max-width: min(34rem, 92%);
+      background: var(--teal);
+      color: white;
+      padding: 0.7rem 0.95rem;
+      border-radius: 1rem 1rem 0.25rem 1rem;
+    }
+    .assistant {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.3rem 1rem 1rem 1rem;
+      padding: 0.95rem 1rem 1rem;
+    }
+    .answer {
+      font-size: 1.05rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+    .pending { color: var(--muted); }
+    .warn {
+      margin-bottom: 0.65rem;
+      color: var(--closed);
+      font-weight: 650;
+    }
+    .problems {
+      margin: 0 0 0.75rem;
+      padding-left: 1.15rem;
+      color: var(--closed);
+      font-size: 0.92rem;
+    }
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+    }
+    .choices button, .ghost {
+      font: inherit;
+      font-size: 0.92rem;
+      background: white;
+      color: var(--teal);
+      border: 1px solid #b7c9ce;
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+    }
+    .choices button:hover, .ghost:hover { background: #eef6f7; }
+    .decl {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 0.7rem;
+    }
+    .decl-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .code { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pill {
+      flex: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.16rem 0.45rem;
+      border-radius: 999px;
+    }
+    .pill.open { color: var(--open); background: var(--open-bg); }
+    .pill.closed { color: var(--closed); background: var(--closed-bg); }
+    .pill.na { color: var(--na); background: var(--na-bg); }
+    .title { margin: 0.3rem 0 0; font-weight: 650; }
+    .sub { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.88rem; }
+    .deadline { margin: 0.45rem 0 0; }
+    .decl a { color: var(--teal); }
+    .meta {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    form {
+      flex: none;
+      margin-top: 0.85rem;
+      padding: 0.9rem;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 0.8rem;
+    }
+    .composer {
+      display: grid;
+      grid-template-columns: 12.5rem 1fr auto;
+      gap: 0.65rem 0.75rem;
+      align-items: end;
+    }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+    label { font-size: 0.8rem; font-weight: 700; }
+    input, select, button { font: inherit; }
+    input, select {
+      width: 100%;
+      font-size: 1rem;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid #cfc4b2;
+      border-radius: 0.55rem;
+      background: white;
+      color: var(--ink);
+    }
+    button[type="submit"] {
+      background: var(--teal);
+      color: white;
+      border: 0;
+      border-radius: 0.55rem;
+      padding: 0.62rem 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button[type="submit"]:disabled { opacity: 0.65; cursor: progress; }
+    input:focus, select:focus, button:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+    .hint {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .fine {
+      flex: none;
+      margin: 0.7rem 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    a { color: var(--teal); }
+    @media (max-width: 700px) {
+      h1 { font-size: 1.6rem; }
+      .wrap { padding: 0.8rem 0.9rem 0.55rem; }
+      .mode { margin-top: 0.55rem; }
+      .composer { grid-template-columns: 1fr; }
+      button[type="submit"] { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Not an official FEMA site</p>
+      <h1>Disaster Aid Navigator</h1>
+      <p class="lede">Can households in your county apply for FEMA Individual Assistance, and by when?</p>
+      <p id="mode" class="mode" hidden></p>
+    </header>
+    <main>
+      <h2 class="sr">Conversation</h2>
+      <ol id="transcript" aria-live="polite"></ol>
+      <form id="ask">
+        <div class="composer">
+          <div class="field">
+            <label for="state">State</label>
+            <select id="state" name="state" required></select>
+          </div>
+          <div class="field">
+            <label for="county">County, parish, or city</label>
+            <input id="county" name="county" list="area-list" placeholder="Harris County" maxlength="80" required autocomplete="off">
+            <datalist id="area-list"></datalist>
+          </div>
+          <button type="submit">Check this county</button>
+          <p id="area-hint" class="hint"></p>
+        </div>
+      </form>
+      <p class="fine">Confirm at <a href="https://www.disasterassistance.gov">DisasterAssistance.gov</a> or <a href="tel:18006213362">1-800-621-3362</a>. Deadlines are calculated from FEMA’s declaration data, then checked before they are shown.</p>
+    </main>
+  </div>
+  <noscript><p>This page needs JavaScript to ask about a county.</p></noscript>
+  <script>
+    const transcript = document.querySelector("#transcript");
+    const form = document.querySelector("#ask");
+    const stateEl = document.querySelector("#state");
+    const countyEl = document.querySelector("#county");
+    const areaList = document.querySelector("#area-list");
+    const hint = document.querySelector("#area-hint");
+    const modeEl = document.querySelector("#mode");
+    const submitBtn = form.querySelector("button[type=submit]");
+    const names = new Map();
+    let busy = false;
+    let areaToken = 0;
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function fmtDate(iso) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || "");
+      if (!match) return iso || "";
+      const when = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+      return when.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    }
+
+    function addUser(message) {
+      const item = el("li", "user");
+      item.append(el("p", null, message));
+      transcript.append(item);
+      item.scrollIntoView({ block: "nearest" });
+    }
+
+    function addAssistant(node) {
+      const item = el("li", "assistant");
+      item.append(node);
+      transcript.append(item);
+      item.scrollIntoView({ block: "nearest" });
+      return item;
+    }
+
+    function pill(status) {
+      if (status === "open") return el("span", "pill open", "Open");
+      if (status === "closed") return el("span", "pill closed", "Closed");
+      return el("span", "pill na", "Not for households");
+    }
+
+    function deadlineLine(row) {
+      if (row.ia_status === "open" && row.ia_deadline) {
+        const left = row.days_left === 0 ? "deadline is today" : `${row.days_left} days left`;
+        const estimate = row.deadline_is_estimate
+          ? " This date is an estimate. FEMA has not published an official filing date."
+          : "";
+        return `Apply by ${fmtDate(row.ia_deadline)} (${left}).${estimate}`;
+      }
+      if (row.ia_status === "closed" && row.ia_deadline) {
+        return `The deadline to apply was ${fmtDate(row.ia_deadline)}.`;
+      }
+      if (row.public_assistance && !row.individual_assistance) {
+        return "Public Assistance only. That helps local governments, not households.";
+      }
+      return "No household application window is open.";
+    }
+
+    function renderCard(row) {
+      const card = el("article", "decl");
+      const top = el("div", "decl-top");
+      top.append(el("span", "code", row.code || "Declaration"));
+      top.append(pill(row.ia_status));
+      card.append(top);
+      if (row.title) card.append(el("p", "title", row.title));
+      const bits = [row.declaration_type, row.incident_type].filter(Boolean);
+      if (row.declaration_date) bits.push(`declared ${fmtDate(row.declaration_date)}`);
+      if (bits.length) card.append(el("p", "sub", bits.join(" · ")));
+      card.append(el("p", "deadline", deadlineLine(row)));
+      if (typeof row.url === "string" && row.url.startsWith("https://www.fema.gov/")) {
+        const link = el("a", null, "Declaration on FEMA.gov");
+        link.href = row.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        const line = el("p", "sub");
+        line.append(link);
+        card.append(line);
+      }
+      return card;
+    }
+
+    function renderAnswer(data) {
+      const wrap = el("div");
+      if (!data.grounding_ok) {
+        wrap.append(el("p", "warn", "This answer failed the fact check. Do not use it to decide a deadline. Confirm at DisasterAssistance.gov or 1-800-621-3362."));
+        const list = el("ul", "problems");
+        for (const problem of data.problems || []) list.append(el("li", null, problem));
+        wrap.append(list);
+      }
+      wrap.append(el("p", "answer", data.text));
+      if (data.ambiguous_areas && data.ambiguous_areas.length) {
+        const choices = el("div", "choices");
+        for (const name of data.ambiguous_areas) {
+          const button = el("button", null, name);
+          button.type = "button";
+          button.addEventListener("click", () => {
+            countyEl.value = name;
+            ask(stateEl.value, name);
+          });
+          choices.append(button);
+        }
+        wrap.append(choices);
+      }
+      for (const row of data.declarations || []) wrap.append(renderCard(row));
+      const refreshed = data.data_refreshed ? ` FEMA data refreshed ${fmtDate(data.data_refreshed)}.` : "";
+      const fact = data.grounding_ok
+        ? `Fact check passed. Every date in this answer is in the declaration data.${refreshed}`
+        : `Fact check failed.${refreshed}`;
+      wrap.append(el("p", "meta", fact));
+      return wrap;
+    }
+
+    function setBusy(on) {
+      busy = on;
+      submitBtn.disabled = on;
+      submitBtn.textContent = on ? "Checking…" : "Check this county";
+    }
+
+    async function ask(state, county) {
+      const place = county.trim();
+      if (busy || !state || !place) return;
+      const stateName = names.get(state) || state;
+      addUser(`Can households in ${place}, ${stateName} get FEMA disaster aid?`);
+      const pending = addAssistant(el("p", "pending", `Checking declarations for ${place}, ${stateName}…`));
+      setBusy(true);
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state, county: place }),
+        });
+        const data = await response.json();
+        pending.remove();
+        if (!response.ok) {
+          addAssistant(el("p", "answer", data.error || "The check failed."));
+          return;
+        }
+        addAssistant(renderAnswer(data));
+      } catch (err) {
+        pending.remove();
+        addAssistant(el("p", "answer", "Could not reach the app. Keep the terminal that started it open, then try again."));
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function loadAreas(state) {
+      const token = ++areaToken;
+      hint.textContent = "Looking up places named in recent declarations…";
+      areaList.replaceChildren();
+      try {
+        const response = await fetch("/api/areas?state=" + encodeURIComponent(state));
+        const data = await response.json();
+        if (token !== areaToken) return;
+        if (!response.ok) {
+          hint.textContent = data.error || "Suggestions are unavailable. You can still type a county.";
+          return;
+        }
+        for (const name of data.areas || []) {
+          areaList.append(el("option", null, name));
+        }
+        const count = (data.areas || []).length;
+        hint.textContent = count === 1
+          ? "1 place appears in a declaration in the last two years. You can still type any county."
+          : count
+            ? `${count} places appear in a declaration in the last two years. You can still type any county.`
+            : "No declared areas in the last two years. You can still type a county.";
+      } catch (err) {
+        if (token !== areaToken) return;
+        hint.textContent = "Suggestions are unavailable. You can still type a county.";
+      }
+    }
+
+    function showMode(config) {
+      modeEl.hidden = false;
+      if (config.source === "fixtures") {
+        modeEl.classList.add("sample");
+        const when = config.as_of ? ` as of ${fmtDate(config.as_of)}` : "";
+        modeEl.textContent = `Sample declarations${when}. This is not a live FEMA lookup.`;
+      } else {
+        modeEl.textContent = "Live FEMA declarations. Deadlines are calculated from that data and checked before they are shown.";
+      }
+    }
+
+    function showExamples(config) {
+      const host = document.querySelector("#examples");
+      if (!host) return;
+      const samples = config.source === "fixtures"
+        ? [
+            ["MO", "St. Louis County", "St. Louis County, MO"],
+            ["TX", "Harris County", "Harris County, TX"],
+            ["MO", "St. Louis", "St. Louis — county or city"],
+          ]
+        : [["TX", "Harris County", "Harris County, TX"]];
+      for (const [state, county, label] of samples) {
+        const button = el("button", null, label);
+        button.type = "button";
+        button.addEventListener("click", () => {
+          stateEl.value = state;
+          countyEl.value = county;
+          loadAreas(state);
+          ask(state, county);
+        });
+        host.append(button);
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      ask(stateEl.value, countyEl.value);
+    });
+    stateEl.addEventListener("change", () => loadAreas(stateEl.value));
+
+    async function init() {
+      const greeting = el("div");
+      greeting.append(el("p", "answer", "Tell me a state and a county, parish, or independent city. I check declarations from the last two years and say whether households can apply, and the deadline."));
+      greeting.append(el("div", "choices", null));
+      greeting.lastChild.id = "examples";
+      addAssistant(greeting);
+      try {
+        const response = await fetch("/api/config");
+        const config = await response.json();
+        for (const state of config.states || []) {
+          names.set(state.code, state.name);
+          const option = el("option", null, `${state.name} (${state.code})`);
+          option.value = state.code;
+          if (state.code === "TX") option.selected = true;
+          stateEl.append(option);
+        }
+        showMode(config);
+        showExamples(config);
+        loadAreas(stateEl.value);
+      } catch (err) {
+        modeEl.hidden = false;
+        modeEl.textContent = "The page could not load its settings. Restart it from the disaster-aid-navigator folder.";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
