@@ -52,19 +52,23 @@ def test_same_name_different_kind_is_ambiguous():
 # --- status logic ------------------------------------------------------------
 
 def test_open_deadline_and_days_left(client):
-    d = report(client, "MO", "St. Louis County").open_ia[0]
+    r = report(client, "MO", "St. Louis County")
+    assert r.open_ia
+    d = next(d for d in r.declarations if d.ia_status == "open")
     assert (d.code, d.ia_deadline, d.days_left, d.deadline_is_estimate) == (
         "DR-9901-MO", date(2026, 11, 30), 27, False)
 
 
 def test_deadline_day_itself_is_still_open(client):
-    d = report(client, "MO", "St. Louis County", as_of=date(2026, 11, 30)).open_ia[0]
+    r = report(client, "MO", "St. Louis County", as_of=date(2026, 11, 30))
+    assert r.open_ia
+    d = next(d for d in r.declarations if d.ia_status == "open")
     assert d.days_left == 0
 
 
 def test_deadline_passes_the_next_day(client):
     r = report(client, "MO", "St. Louis County", as_of=date(2026, 12, 1))
-    assert r.open_ia == []
+    assert not r.open_ia
 
 
 def test_missing_filing_date_is_estimated_and_flagged(client):
@@ -132,6 +136,7 @@ def test_checker_accepts_a_correct_answer(stl_payload):
     (GOOD.replace("November 30, 2026", "December 30, 2026"), "date not in facts"),
     (GOOD.replace("DR-9901-MO", "DR-4821-MO"), "declaration code not in facts"),
     (GOOD.replace("27 days", "30 days"), "day count not in facts"),
+    (GOOD.replace("27 days", "730 days"), "day count not in facts"),  # lookback is years, not days
     ("Yes, households can apply. Apply at https://www.disasterassistance.gov.", "open deadline missing"),
     (GOOD.replace("November 30, 2026", "Nov. 31, 2026").replace("Nov. 31", "Dec 1"), "date not in facts"),
 ])

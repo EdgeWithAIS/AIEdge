@@ -8,6 +8,8 @@ checked in code before it is trusted:
 3. Every "N days" count must match a days_left value.
 4. Every open deadline must be stated in the answer.
 5. Estimated deadlines must be called estimates.
+
+English and Spanish answers are both checked ("30 de noviembre de 2026", "27 días").
 """
 from __future__ import annotations
 
@@ -22,8 +24,11 @@ DATE_PATTERNS = [
     (r"\b\d{4}-\d{2}-\d{2}\b", ["%Y-%m-%d"]),
     (r"\b\d{1,2}/\d{1,2}/\d{4}\b", ["%m/%d/%Y"]),
 ]
+MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+         "septiembre", "octubre", "noviembre", "diciembre"]
+SPANISH_DATE_RE = re.compile(rf"\b(\d{{1,2}})\s+de\s+({'|'.join(MESES)})\s+de\s+(\d{{4}})\b", re.I)
 CODE_RE = re.compile(r"\b(?:DR|EM|FM)-\d{3,5}(?:-[A-Z]{2})?\b")
-DAYS_RE = re.compile(r"\b(\d{1,3})\s+days?\b", re.I)
+DAYS_RE = re.compile(r"\b(\d{1,3})\s+(?:days?|d[ií]as?)\b", re.I)
 
 
 def _parse(text: str, formats: list[str]) -> date | None:
@@ -43,6 +48,11 @@ def dates_in(text: str) -> set[date]:
             d = _parse(m.group(0), formats)
             if d:
                 found.add(d)
+    for m in SPANISH_DATE_RE.finditer(text):
+        try:
+            found.add(date(int(m.group(3)), MESES.index(m.group(2).lower()) + 1, int(m.group(1))))
+        except ValueError:
+            pass
     return found
 
 
@@ -66,7 +76,7 @@ def check_answer(answer: str, payload: dict) -> list[str]:
             problems.append(f"declaration code not in facts: {code}")
 
     allowed_days = {d["days_left"] for d in decls if "days_left" in d}
-    allowed_days |= {60, payload.get("searched_last_days", 0)}  # FEMA's usual window, lookback
+    allowed_days.add(60)  # FEMA's usual IA application window cited in estimate wording
     for n in sorted({int(x) for x in DAYS_RE.findall(answer)}):
         if n not in allowed_days:
             problems.append(f"day count not in facts: {n} days")
@@ -75,6 +85,6 @@ def check_answer(answer: str, payload: dict) -> list[str]:
         if d.get("ia_status") == "open":
             if date.fromisoformat(d["ia_deadline"]) not in dates_in(answer):
                 problems.append(f"open deadline missing for {d['code']}")
-            if d.get("deadline_is_estimate") and "estimat" not in answer.lower():
+            if d.get("deadline_is_estimate") and "estima" not in answer.lower():
                 problems.append(f"estimated deadline for {d['code']} not called an estimate")
     return problems

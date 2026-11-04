@@ -66,8 +66,9 @@ class CountyReport:
         self.county_name = self.county_name or self.county_query
 
     @property
-    def open_ia(self) -> list[Declaration]:
-        return [d for d in self.declarations if d.ia_status == "open"]
+    def open_ia(self) -> bool:
+        """True when any declaration still accepts individual assistance applications."""
+        return any(d.ia_status == "open" for d in self.declarations)
 
     def to_payload(self) -> dict:
         """Compact JSON-safe facts: the only thing the explainer may use."""
