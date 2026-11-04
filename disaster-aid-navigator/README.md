@@ -7,9 +7,12 @@ Enter a state and county. The app checks FEMA's official disaster declarations a
 ```
 $ python3 -m disaster_aid.cli MO "St. Louis County"
 
-Yes. Households in St. Louis County can apply for FEMA Individual Assistance now.
-DR-9901-MO (Severe Storms, Straight-line Winds, and Tornadoes, declared October 1, 2026):
-apply by November 30, 2026 (27 days left). ...
+Yes. Families in St. Louis County can apply for FEMA help now.
+
+Severe storms, straight-line winds, and tornadoes in Missouri (DR-9901-MO)
+This happened from September 14, 2026 to September 16, 2026.
+FEMA declared a major disaster on October 1, 2026.
+You can apply until November 30, 2026. You have 27 days left.
 
   grounding check: PASS
 ```

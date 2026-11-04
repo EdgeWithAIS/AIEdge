@@ -101,6 +101,14 @@ def test_no_declaration_answer_needs_no_ai(client):
     assert ans.model == "rule" and not ans.used_llm
 
 
+def test_template_uses_fema_declaration_layout(client):
+    text = TemplateExplainer().explain(report(client, "MO", "St. Louis County")).text
+    assert "Severe storms, straight-line winds, and tornadoes in Missouri (DR-9901-MO)" in text
+    assert "This happened from September 14, 2026 to September 16, 2026." in text
+    assert "FEMA declared a major disaster on October 1, 2026." in text
+    assert "You have 27 days left." in text
+
+
 def test_template_answers_are_grounded(client):
     for state, county in [("MO", "St. Louis County"), ("KY", "Pike"), ("TX", "Harris")]:
         r = report(client, state, county)
