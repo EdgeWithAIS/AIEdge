@@ -109,6 +109,7 @@
       font-size: 1.05rem;
       line-height: 1.55;
       overflow-wrap: anywhere;
+      white-space: pre-wrap;
     }
     .pending { color: var(--muted); }
     .warn {
@@ -241,7 +242,7 @@
     <header>
       <p class="eyebrow">Not an official FEMA site</p>
       <h1>Disaster Aid Navigator</h1>
-      <p class="lede">Can households in your county apply for FEMA Individual Assistance, and by when?</p>
+      <p class="lede">Can families in your county get FEMA help, and by what date?</p>
       <p id="mode" class="mode" hidden></p>
     </header>
     <main>
@@ -311,24 +312,24 @@
     function pill(status) {
       if (status === "open") return el("span", "pill open", "Open");
       if (status === "closed") return el("span", "pill closed", "Closed");
-      return el("span", "pill na", "Not for households");
+      return el("span", "pill na", "Not for families");
     }
 
     function deadlineLine(row) {
       if (row.ia_status === "open" && row.ia_deadline) {
-        const left = row.days_left === 0 ? "deadline is today" : `${row.days_left} days left`;
+        const left = row.days_left === 0 ? "That is today." : `You have ${row.days_left} days left.`;
         const estimate = row.deadline_is_estimate
-          ? " This date is an estimate. FEMA has not published an official filing date."
+          ? " This date is an estimate. FEMA has not published an official date."
           : "";
-        return `Apply by ${fmtDate(row.ia_deadline)} (${left}).${estimate}`;
+        return `You can apply until ${fmtDate(row.ia_deadline)}. ${left}${estimate}`;
       }
       if (row.ia_status === "closed" && row.ia_deadline) {
-        return `The deadline to apply was ${fmtDate(row.ia_deadline)}.`;
+        return `The last day to apply was ${fmtDate(row.ia_deadline)}. That date has passed.`;
       }
       if (row.public_assistance && !row.individual_assistance) {
-        return "Public Assistance only. That helps local governments, not households.";
+        return "This money goes to local government, not to families.";
       }
-      return "No household application window is open.";
+      return "This does not include help for families.";
     }
 
     function renderCard(row) {
@@ -395,7 +396,7 @@
       const place = county.trim();
       if (busy || !state || !place) return;
       const stateName = names.get(state) || state;
-      addUser(`Can households in ${place}, ${stateName} get FEMA disaster aid?`);
+      addUser(`Can families in ${place}, ${stateName} get FEMA help?`);
       const pending = addAssistant(el("p", "pending", `Checking declarations for ${place}, ${stateName}…`));
       setBusy(true);
       try {
@@ -488,7 +489,7 @@
 
     async function init() {
       const greeting = el("div");
-      greeting.append(el("p", "answer", "Tell me a state and a county, parish, or independent city. I check declarations from the last two years and say whether households can apply, and the deadline."));
+      greeting.append(el("p", "answer", "Tell me a state and a county, parish, or city. I will check FEMA disasters from the last two years and tell you if families can apply, and the last day to apply."));
       greeting.append(el("div", "choices", null));
       greeting.lastChild.id = "examples";
       addAssistant(greeting);

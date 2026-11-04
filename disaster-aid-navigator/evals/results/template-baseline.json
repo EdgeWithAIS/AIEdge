@@ -20,13 +20,13 @@
       "why": "open IA with a published deadline, plus an older closed disaster",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 58,
+      "words": 104,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "Yes. Households in St. Louis County can apply for FEMA Individual Assistance now. DR-9901-MO (Severe Storms, Straight-line Winds, and Tornadoes, declared October 1, 2026): apply by November 30, 2026 (27 days left). DR-9910-MO (Severe Storms and Flooding, declared July 10, 2025): the deadline to apply was September 8, 2025. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.8,
+      "answer": "Yes. Families in St. Louis County can apply for FEMA help now.\n\nSevere storms, straight-line winds, and tornadoes in Missouri (DR-9901-MO)\nThis happened from September 14, 2026 to September 16, 2026.\nFEMA declared a major disaster on October 1, 2026.\nYou can apply until November 30, 2026. You have 27 days left.\n\nSevere storms and flooding in Missouri (DR-9910-MO)\nThis happened from June 20, 2025 to June 24, 2025.\nFEMA declared a major disaster on July 10, 2025.\nThe last day to apply was September 8, 2025. That date has passed.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s02",
@@ -34,13 +34,13 @@
       "why": "same name as the county, but only Public Assistance",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 42,
+      "words": 64,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for St. Louis city right now. DR-9901-MO (Severe Storms, Straight-line Winds, and Tornadoes, declared October 1, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.2,
+      "answer": "No. FEMA help for families in St. Louis city is not open right now.\n\nSevere storms, straight-line winds, and tornadoes in Missouri (DR-9901-MO)\nThis happened from September 14, 2026 to September 16, 2026.\nFEMA declared a major disaster on October 1, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s03",
@@ -54,7 +54,7 @@
       "input_tokens": 0,
       "output_tokens": 0,
       "latency_ms": 0.0,
-      "answer": "\"Saint Louis\" matches more than one area in MO: St. Louis County or St. Louis city. Please say which one, for example \"St. Louis County\"."
+      "answer": "\"Saint Louis\" could be more than one place in MO: St. Louis County or St. Louis city. Please name one, for example \"St. Louis County\"."
     },
     {
       "id": "s04",
@@ -62,13 +62,13 @@
       "why": "declared, but Public Assistance only",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 41,
+      "words": 63,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for Jefferson County right now. DR-9901-MO (Severe Storms, Straight-line Winds, and Tornadoes, declared October 1, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.3,
+      "answer": "No. FEMA help for families in Jefferson County is not open right now.\n\nSevere storms, straight-line winds, and tornadoes in Missouri (DR-9901-MO)\nThis happened from September 14, 2026 to September 16, 2026.\nFEMA declared a major disaster on October 1, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s05",
@@ -76,13 +76,13 @@
       "why": "IA deadline has passed; separate emergency declaration",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 52,
+      "words": 95,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for Harris County right now. DR-9902-TX (Hurricane Marisol, declared June 15, 2026): the deadline to apply was August 14, 2026. EM-9903-TX (Hurricane Marisol, declared June 12, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.5,
+      "answer": "No. FEMA help for families in Harris County is not open right now.\n\nHurricane marisol in Texas (DR-9902-TX)\nThis happened from June 10, 2026 to June 14, 2026.\nFEMA declared a major disaster on June 15, 2026.\nThe last day to apply was August 14, 2026. That date has passed.\n\nHurricane marisol in Texas (EM-9903-TX)\nThis happened from June 10, 2026 to June 14, 2026.\nFEMA declared an emergency on June 12, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s06",
@@ -90,13 +90,13 @@
       "why": "IA declared but no filing date published: must be flagged as an estimate",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 58,
+      "words": 82,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "Yes. Households in Pike County can apply for FEMA Individual Assistance now. DR-9904-KY (Severe Storms, Flooding, Landslides, and Mudslides, declared September 20, 2026): apply by November 19, 2026 (16 days left). This date is an estimate based on FEMA's usual 60-day window; FEMA has not published an official date. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.3,
+      "answer": "Yes. Families in Pike County can apply for FEMA help now.\n\nSevere storms, flooding, landslides, and mudslides in Kentucky (DR-9904-KY)\nThis happened from September 5, 2026 to September 9, 2026.\nFEMA declared a major disaster on September 20, 2026.\nYou can apply until November 19, 2026. You have 16 days left. This date is an estimate. FEMA usually gives 60 days, and it has not published an official date.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s07",
@@ -104,13 +104,13 @@
       "why": "fire management declaration plus a statewide emergency",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 49,
+      "words": 87,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for Los Angeles County right now. FM-9906-CA (Canyon Ridge Fire, declared September 10, 2026): no assistance for households. EM-9905-CA (Wildfires, declared August 1, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.4,
+      "answer": "No. FEMA help for families in Los Angeles County is not open right now.\n\nCanyon ridge fire in California (FM-9906-CA)\nThis happened from September 9, 2026 to September 20, 2026.\nFEMA declared help for a fire on September 10, 2026.\nThis does not include help for families.\n\nWildfires in California (EM-9905-CA)\nThis happened on July 28, 2026.\nFEMA declared an emergency on August 1, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s08",
@@ -118,13 +118,13 @@
       "why": "only covered by the statewide declaration",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 35,
+      "words": 52,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for Fresno right now. EM-9905-CA (Wildfires, declared August 1, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.2,
+      "answer": "No. FEMA help for families in Fresno is not open right now.\n\nWildfires in California (EM-9905-CA)\nThis happened on July 28, 2026.\nFEMA declared an emergency on August 1, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s09",
@@ -132,13 +132,13 @@
       "why": "parish naming; duplicate rows for one disaster must merge",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 36,
+      "words": 60,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "Yes. Households in Orleans Parish can apply for FEMA Individual Assistance now. DR-9907-LA (Hurricane Owen, declared October 20, 2026): apply by December 19, 2026 (46 days left). Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.3,
+      "answer": "Yes. Families in Orleans Parish can apply for FEMA help now.\n\nHurricane owen in Louisiana (DR-9907-LA)\nThis happened from October 12, 2026 to October 15, 2026.\nFEMA declared a major disaster on October 20, 2026.\nYou can apply until December 19, 2026. You have 46 days left.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s10",
@@ -146,13 +146,13 @@
       "why": "only declaration is older than the 2-year lookback",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 43,
+      "words": 42,
       "used_llm": false,
       "model": "rule",
       "input_tokens": 0,
       "output_tokens": 0,
       "latency_ms": 0.0,
-      "answer": "No federal disaster declarations were found for Miami-Dade, FL in the last 2 years, so FEMA Individual Assistance is not available there right now. If you had damage recently, check https://www.disasterassistance.gov or call 1-800-621-3362, because new declarations can be added at any time."
+      "answer": "No FEMA disaster was found for Miami-Dade, FL in the last 2 years. Help for families is not open there right now. If your home was damaged recently, check https://www.disasterassistance.gov or call 1-800-621-3362. A new disaster can be added at any time."
     },
     {
       "id": "s11",
@@ -166,7 +166,7 @@
       "input_tokens": 0,
       "output_tokens": 0,
       "latency_ms": 0.0,
-      "answer": "\"Richmond\" matches more than one area in VA: Richmond County or Richmond city. Please say which one, for example \"Richmond County\"."
+      "answer": "\"Richmond\" could be more than one place in VA: Richmond County or Richmond city. Please name one, for example \"Richmond County\"."
     },
     {
       "id": "s12",
@@ -174,13 +174,13 @@
       "why": "user disambiguates",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 38,
+      "words": 62,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "Yes. Households in Richmond County can apply for FEMA Individual Assistance now. DR-9909-VA (Severe Storms and Flooding, declared September 25, 2026): apply by November 24, 2026 (21 days left). Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.3,
+      "answer": "Yes. Families in Richmond County can apply for FEMA help now.\n\nSevere storms and flooding in Virginia (DR-9909-VA)\nThis happened from September 1, 2026 to September 3, 2026.\nFEMA declared a major disaster on September 25, 2026.\nYou can apply until November 24, 2026. You have 21 days left.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s13",
@@ -188,18 +188,32 @@
       "why": "user disambiguates the other way",
       "status_errors": [],
       "grounding_problems": [],
-      "words": 39,
+      "words": 61,
       "used_llm": false,
       "model": "template-baseline",
       "input_tokens": 0,
       "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No. FEMA Individual Assistance is not open for Richmond city right now. DR-9909-VA (Severe Storms and Flooding, declared September 25, 2026): Public Assistance only, which helps local governments, not households. Apply or check your deadline at https://www.disasterassistance.gov or 1-800-621-3362."
+      "latency_ms": 0.2,
+      "answer": "No. FEMA help for families in Richmond city is not open right now.\n\nSevere storms and flooding in Virginia (DR-9909-VA)\nThis happened from September 1, 2026 to September 3, 2026.\nFEMA declared a major disaster on September 25, 2026.\nThis money goes to local government, not to families.\n\nTo apply, or to check your date, go to https://www.disasterassistance.gov or call 1-800-621-3362."
     },
     {
       "id": "s14",
       "query": "Kings, NY",
       "why": "no declarations at all: no AI call",
+      "status_errors": [],
+      "grounding_problems": [],
+      "words": 42,
+      "used_llm": false,
+      "model": "rule",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0.0,
+      "answer": "No FEMA disaster was found for Kings, NY in the last 2 years. Help for families is not open there right now. If your home was damaged recently, check https://www.disasterassistance.gov or call 1-800-621-3362. A new disaster can be added at any time."
+    },
+    {
+      "id": "s15",
+      "query": "Narnia County, MO",
+      "why": "county that does not exist",
       "status_errors": [],
       "grounding_problems": [],
       "words": 43,
@@ -208,21 +222,7 @@
       "input_tokens": 0,
       "output_tokens": 0,
       "latency_ms": 0.0,
-      "answer": "No federal disaster declarations were found for Kings, NY in the last 2 years, so FEMA Individual Assistance is not available there right now. If you had damage recently, check https://www.disasterassistance.gov or call 1-800-621-3362, because new declarations can be added at any time."
-    },
-    {
-      "id": "s15",
-      "query": "Narnia County, MO",
-      "why": "county that does not exist",
-      "status_errors": [],
-      "grounding_problems": [],
-      "words": 44,
-      "used_llm": false,
-      "model": "rule",
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "latency_ms": 0.0,
-      "answer": "No federal disaster declarations were found for Narnia County, MO in the last 2 years, so FEMA Individual Assistance is not available there right now. If you had damage recently, check https://www.disasterassistance.gov or call 1-800-621-3362, because new declarations can be added at any time."
+      "answer": "No FEMA disaster was found for Narnia County, MO in the last 2 years. Help for families is not open there right now. If your home was damaged recently, check https://www.disasterassistance.gov or call 1-800-621-3362. A new disaster can be added at any time."
     }
   ]
 }
