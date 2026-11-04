@@ -157,7 +157,7 @@ def test_address_answer_has_steps_and_denial_help(client):
 
 
 def test_unknown_place_gives_a_clear_error(client):
-    with pytest.raises(ValueError, match="could not find ZIP code 99999"):
+    with pytest.raises(ValueError, match="not in the small sample ZIP list"):
         answer_place("99999", locator=locator(), client=client, explainer=TemplateExplainer(), as_of=TODAY)
     with pytest.raises(ValueError, match="could not find that address"):
         answer_place("nowhere at all", locator=locator(), client=client, explainer=TemplateExplainer(),
@@ -183,6 +183,10 @@ def test_http_place_spanish_and_help(client):
         assert "14 de agosto de 2026" in data["text"] and data["grounding_ok"]
         with urllib.request.urlopen(base + "/api/help?lang=es", timeout=5) as r:
             assert json.loads(r.read())["title"].startswith("¿FEMA")
+        with urllib.request.urlopen(base + "/api/steps?lang=en", timeout=5) as r:
+            steps = json.loads(r.read())
+        assert steps["title"] == "What to do next"
+        assert any("application number" in item for item in steps["items"])
     finally:
         httpd.shutdown()
         httpd.server_close()

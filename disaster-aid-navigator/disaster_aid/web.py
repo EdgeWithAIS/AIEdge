@@ -24,7 +24,7 @@ from .explainer import TemplateExplainer, default_explainer, state_name, status_
 from .fema_client import STATE_FIPS, STATE_NAMES, FemaClient, FixtureClient
 from .geo import friendly, is_statewide
 from .grounding import check_answer
-from .guidance import check_lang, denial_help, next_steps, offers_denial_help
+from .guidance import check_lang, denial_help, general_next_steps, next_steps, offers_denial_help
 from .locate import Locator
 from .status import DEFAULT_LOOKBACK_DAYS, build_report
 
@@ -112,6 +112,9 @@ PLACE_TEXT = {
         "many": "ZIP code {query} covers more than one county. Pick yours below, "
                 "or type your street address to be sure.",
         "none_zip": "I could not find ZIP code {query}. Check the numbers, or search by county.",
+        "none_zip_sample": "ZIP code {query} is not in the small sample ZIP list this app was started "
+                           "with. Restart it without --zip-file to use the full Census list, or "
+                           "search by county.",
         "none_address": "I could not find that address. Add the city and state, "
                         "or try your ZIP code or county.",
     },
@@ -121,6 +124,9 @@ PLACE_TEXT = {
         "many": "El código postal {query} abarca más de un condado. Elija el suyo abajo, "
                 "o escriba su dirección para estar seguro.",
         "none_zip": "No encontré el código postal {query}. Revise los números, o busque por condado.",
+        "none_zip_sample": "El código postal {query} no está en la pequeña lista de muestra con la que "
+                           "se inició esta aplicación. Reiníciela sin --zip-file para usar la lista "
+                           "completa del Censo, o busque por condado.",
         "none_address": "No encontré esa dirección. Agregue la ciudad y el estado, "
                         "o pruebe con su código postal o condado.",
     },
@@ -134,7 +140,10 @@ def answer_place(text: str, *, locator, client, explainer, as_of: date | None = 
     t = PLACE_TEXT[lang]
     loc = locator.locate(text)
     if not loc.places:
-        raise ValueError(t["none_" + loc.kind].format(query=loc.query))
+        key = "none_" + loc.kind
+        if loc.kind == "zip" and getattr(locator, "zcta_file", None):
+            key = "none_zip_sample"  # A custom file, not the full Census list.
+        raise ValueError(t[key].format(query=loc.query))
     choices = [{**p.to_dict(), "label": f"{p.county}, {state_name(p.state, lang)}"} for p in loc.places]
     located = {"query": loc.query, "kind": loc.kind, "matched_address": loc.matched_address,
                "choices": choices}
@@ -198,6 +207,8 @@ def make_handler(app: App):
                 self._areas()
             elif path == "/api/help":
                 self._help()
+            elif path == "/api/steps":
+                self._steps()
             else:
                 self._json(404, {"error": "Not found."})
 
@@ -230,6 +241,13 @@ def make_handler(app: App):
             lang = (parse_qs(urlparse(self.path).query).get("lang") or ["en"])[0]
             try:
                 self._json(200, denial_help(lang))
+            except ValueError as err:
+                self._fail(err)
+
+        def _steps(self) -> None:
+            lang = (parse_qs(urlparse(self.path).query).get("lang") or ["en"])[0]
+            try:
+                self._json(200, general_next_steps(lang))
             except ValueError as err:
                 self._fail(err)
 

@@ -102,6 +102,12 @@ def next_steps(report: CountyReport | None, lang: str = "en") -> dict:
     return {"title": _TITLES[lang]["next"], "items": [_COMMON[lang].get(i, i) for i in items]}
 
 
+def general_next_steps(lang: str = "en") -> dict:
+    """The checklist for someone whose county is open for FEMA help, with no county given."""
+    lang = check_lang(lang)
+    return {"title": _TITLES[lang]["next"], "items": [_COMMON[lang].get(i, i) for i in _OPEN[lang]]}
+
+
 _DENIAL = {
     "en": {
         "intro": "A \"no\" from FEMA is often not the end. Many people are turned down at first "
