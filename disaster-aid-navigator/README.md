@@ -82,6 +82,16 @@ python3 -m disaster_aid.cli TX "Harris County" --offline
 export ANTHROPIC_API_KEY="sk-ant-..."
 python3 -m disaster_aid.cli TX "Harris County"
 
+# ZIP code or street address instead of a county (free U.S. Census data, no key)
+python3 -m disaster_aid.cli --place 77002 --offline
+python3 -m disaster_aid.cli --place "1001 Avenida de las Americas, Houston, TX 77010" --offline
+
+# Spanish answer, plus the "what to do next" checklist
+python3 -m disaster_aid.cli TX "Harris County" --offline --lang es --steps
+
+# How to appeal a FEMA "no" letter (add --lang es for Spanish)
+python3 -m disaster_aid.cli --denied
+
 # Web page, same as the offline command above: live FEMA data, template answer
 python3 -m disaster_aid.web
 
@@ -97,7 +107,9 @@ On macOS, if you see `CERTIFICATE_VERIFY_FAILED`, run `python3 -m pip install --
 
 - **Deterministic core, AI at the edge.** Deadlines and eligibility are computed in code that's 100% testable. The model never does date arithmetic.
 - **Verify, don't trust.** The grounding check runs on every answer, including in the CLI, so a made-up date is caught right away.
-- **County, not ZIP code.** FEMA's FAQ says ZIP codes can't be used because they cross county lines.
+- **County first, even for ZIP codes.** FEMA declares counties, and ZIP codes cross county lines. A ZIP code is turned into counties with the Census 2020 ZIP-to-county file (downloaded once, about 7 MB, cached in `~/.cache/disaster-aid-navigator`). If it covers more than one county, the app lists them and asks. A street address goes to the Census Geocoder, which returns one county. Neither is saved.
+- **Spanish uses the same fact check.** Spanish answers keep dates and codes exact ("30 de noviembre de 2026"), and the grounding check reads Spanish dates and "días", so a wrong deadline is caught in either language.
+- **Fixed help text.** The "what to do next" checklist and the appeal help are written in code, not by the AI. They hold no disaster-specific dates, so there is nothing for a model to get wrong.
 - **Synthetic fixtures.** Tests and CI never hit the network, so results are reproducible. `fixtures/README.md` explains each edge case.
 - **No dependencies.** The Python standard library only, so the whole pipeline can be read and debugged.
 
@@ -111,7 +123,9 @@ On macOS, if you see `CERTIFICATE_VERIFY_FAILED`, run `python3 -m pip install --
 
 - [ ] Validate `lastIAFilingDate` against FEMA deadline-extension press releases
 - [ ] Run the Claude evals and fill in the results table
-- [ ] Spanish answers (FEMA serves many Spanish-speaking survivors)
+- [x] Spanish answers (FEMA serves many Spanish-speaking survivors)
+- [x] Search by ZIP code or street address
+- [x] "What to do next" checklist and help after a FEMA denial
 - [x] Simple web page with a state/county picker (`python3 -m disaster_aid.web`)
 - [ ] SBA disaster loan deadlines alongside FEMA's
 

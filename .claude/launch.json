@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "disaster-aid-sample",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd disaster-aid-navigator && python3 -m disaster_aid.web --port 8765 --fixtures fixtures/declarations.json --as-of 2026-11-03 --zip-file fixtures/zcta_county_sample.txt"],
+      "port": 8765
+    }
+  ]
+}

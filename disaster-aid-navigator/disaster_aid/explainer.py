@@ -1,8 +1,11 @@
-"""Explain a CountyReport in plain English.
+"""Explain a CountyReport in plain English or Spanish.
 
 * No declarations, or an ambiguous county name: a fixed message, no AI call.
 * Otherwise ``ClaudeExplainer`` writes a short answer from the facts JSON,
   or ``TemplateExplainer`` does it offline with no API key.
+
+``lang`` is "en" (English, the default) or "es" (Spanish). Dates and
+declaration codes stay exact in both, so the same fact check runs on both.
 """
 from __future__ import annotations
 
@@ -16,6 +19,7 @@ from datetime import date
 
 from .fema_client import STATE_NAMES
 from .geo import friendly
+from .guidance import check_lang
 from .status import APPLY_URL, FEMA_HELPLINE, CountyReport, Declaration
 
 SYSTEM_PROMPT = f"""You explain FEMA disaster news to families. Write so someone who finished 8th grade can understand it.
@@ -45,11 +49,107 @@ Rules:
 - If the only program is Public Assistance: "This money goes to local government, not to families."
 End with: To apply, or to check your date, go to {APPLY_URL} or call {FEMA_HELPLINE}."""
 
-DECLARED_LINE = {
-    "Major Disaster": "FEMA declared a major disaster on {date}.",
-    "Emergency": "FEMA declared an emergency on {date}.",
-    "Fire Management": "FEMA declared help for a fire on {date}.",
+SPANISH_RULES = f"""
+
+LANGUAGE: Write the whole answer in simple Spanish (español sencillo), using "usted".
+Keep declaration codes exactly as they are. Write every date like "22 de julio de 2025".
+Use these sentences in place of the English ones:
+- First sentence: "Sí. Las familias de {{county}} pueden pedir ayuda de FEMA ahora." or "No. La ayuda de FEMA para familias de {{county}} no está abierta ahora."
+- Block first line: the kind of disaster in Spanish, "en" the state name in Spanish, then the code. Example: "Tormentas fuertes en Misuri (DR-4885-MO)". Then: "Nombre oficial de FEMA: {{title}}."
+- "Esto pasó del {{begin}} al {{end}}." or "Esto pasó el {{date}}."
+- "FEMA declaró un desastre mayor el {{date}}." / "FEMA declaró una emergencia el {{date}}." / "FEMA declaró ayuda por un incendio el {{date}}."
+- "Puede pedir ayuda hasta el {{date}}. Le quedan {{days_left}} días." or, when days_left is 0, "Puede pedir ayuda hasta el {{date}}. Hoy es el último día."
+- Estimate: "Esta fecha es estimada. FEMA suele dar 60 días y no ha publicado una fecha oficial."
+- "El último día para pedir ayuda fue el {{date}}. Esa fecha ya pasó."
+- "Este dinero es para el gobierno local, no para las familias."
+End with: Para pedir ayuda o revisar su fecha, visite {APPLY_URL} o llame al {FEMA_HELPLINE}. Hay ayuda en español."""
+
+MONTHS_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre"]
+
+# Spanish names where they differ from English.
+STATE_NAMES_ES = {
+    "DC": "el Distrito de Columbia", "HI": "Hawái", "LA": "Luisiana", "MI": "Míchigan",
+    "MS": "Misisipi", "MO": "Misuri", "NJ": "Nueva Jersey", "NM": "Nuevo México",
+    "NY": "Nueva York", "NC": "Carolina del Norte", "SC": "Carolina del Sur",
+    "ND": "Dakota del Norte", "SD": "Dakota del Sur", "OR": "Oregón", "PA": "Pensilvania",
+    "WV": "Virginia Occidental", "AS": "Samoa Estadounidense", "MP": "las Islas Marianas del Norte",
+    "VI": "las Islas Vírgenes de EE. UU.",
 }
+
+# OpenFEMA incidentType -> Spanish. FEMA titles are free text, so Spanish answers
+# name the kind of disaster in Spanish and show FEMA's official English title too.
+INCIDENT_ES = {
+    "Biological": "Emergencia biológica", "Chemical": "Emergencia química",
+    "Coastal Storm": "Tormenta costera", "Dam/Levee Break": "Rotura de presa o dique",
+    "Drought": "Sequía", "Earthquake": "Terremoto", "Fire": "Incendio",
+    "Fishing Losses": "Pérdidas de pesca", "Flood": "Inundaciones", "Freezing": "Heladas",
+    "Hurricane": "Huracán", "Mud/Landslide": "Deslaves", "Severe Ice Storm": "Tormenta de hielo",
+    "Severe Storm": "Tormentas fuertes", "Snowstorm": "Tormenta de nieve",
+    "Straight-Line Winds": "Vientos fuertes", "Tornado": "Tornados",
+    "Tropical Storm": "Tormenta tropical", "Tsunami": "Tsunami", "Typhoon": "Tifón",
+    "Volcanic Eruption": "Erupción volcánica", "Winter Storm": "Tormenta invernal",
+}
+
+TEXT = {
+    "en": {
+        "declared": {
+            "Major Disaster": "FEMA declared a major disaster on {date}.",
+            "Emergency": "FEMA declared an emergency on {date}.",
+            "Fire Management": "FEMA declared help for a fire on {date}.",
+        },
+        "declared_other": "FEMA declared this on {date}.",
+        "range": "This happened from {begin} to {end}.",
+        "on": "This happened on {date}.",
+        "open": "You can apply until {date}. You have {n} days left.",
+        "open_one": "You can apply until {date}. You have 1 day left.",
+        "open_today": "You can apply until {date}. That is today.",
+        "estimate": "This date is an estimate. FEMA usually gives 60 days, and it has not published an official date.",
+        "closed": "The last day to apply was {date}. That date has passed.",
+        "pa_only": "This money goes to local government, not to families.",
+        "none": "This does not include help for families.",
+        "yes": "Yes. Families in {county} can apply for FEMA help now.",
+        "no": "No. FEMA help for families in {county} is not open right now.",
+        "end": f"To apply, or to check your date, go to {APPLY_URL} or call {FEMA_HELPLINE}.",
+        "ambiguous": "\"{query}\" could be more than one place in {state}: {names}. "
+                     "Please name one, for example \"{first}\".",
+        "or": " or ",
+        "no_decl": (f"No FEMA disaster was found for {{query}}, {{state}} in the last {{years}} years. "
+                    f"Help for families is not open there right now. If your home was damaged recently, "
+                    f"check {APPLY_URL} or call {FEMA_HELPLINE}. A new disaster can be added at any time."),
+    },
+    "es": {
+        "declared": {
+            "Major Disaster": "FEMA declaró un desastre mayor el {date}.",
+            "Emergency": "FEMA declaró una emergencia el {date}.",
+            "Fire Management": "FEMA declaró ayuda por un incendio el {date}.",
+        },
+        "declared_other": "FEMA hizo esta declaración el {date}.",
+        "range": "Esto pasó del {begin} al {end}.",
+        "on": "Esto pasó el {date}.",
+        "open": "Puede pedir ayuda hasta el {date}. Le quedan {n} días.",
+        "open_one": "Puede pedir ayuda hasta el {date}. Le queda 1 día.",
+        "open_today": "Puede pedir ayuda hasta el {date}. Hoy es el último día.",
+        "estimate": "Esta fecha es estimada. FEMA suele dar 60 días y no ha publicado una fecha oficial.",
+        "closed": "El último día para pedir ayuda fue el {date}. Esa fecha ya pasó.",
+        "pa_only": "Este dinero es para el gobierno local, no para las familias.",
+        "none": "Esto no incluye ayuda para familias.",
+        "yes": "Sí. Las familias de {county} pueden pedir ayuda de FEMA ahora.",
+        "no": "No. La ayuda de FEMA para familias de {county} no está abierta ahora.",
+        "end": (f"Para pedir ayuda o revisar su fecha, visite {APPLY_URL} o llame al {FEMA_HELPLINE}. "
+                "Hay ayuda en español."),
+        "ambiguous": "\"{query}\" puede ser más de un lugar en {state}: {names}. "
+                     "Por favor, elija uno; por ejemplo, \"{first}\".",
+        "or": " o ",
+        "no_decl": (f"No se encontró ningún desastre de FEMA para {{query}}, {{state}} en los últimos "
+                    f"{{years}} años. La ayuda para familias no está abierta allí ahora. Si su casa sufrió "
+                    f"daños hace poco, visite {APPLY_URL} o llame al {FEMA_HELPLINE}. FEMA puede agregar "
+                    f"un desastre nuevo en cualquier momento."),
+    },
+}
+
+# Kept for callers that used the English table directly.
+DECLARED_LINE = TEXT["en"]["declared"]
 
 
 @dataclass
@@ -61,8 +161,10 @@ class Explanation:
     used_llm: bool = False
 
 
-def fmt_date(d: date | str) -> str:
+def fmt_date(d: date | str, lang: str = "en") -> str:
     d = date.fromisoformat(d) if isinstance(d, str) else d
+    if lang == "es":
+        return f"{d.day} de {MONTHS_ES[d.month - 1]} de {d.year}"
     return f"{d:%B} {d.day}, {d.year}"
 
 
@@ -71,52 +173,65 @@ def plain_title(text: str) -> str:
     return text[:1].upper() + text[1:].lower() if text else text
 
 
-def what_happened(begin: date | None, end: date | None) -> str | None:
+def state_name(state: str, lang: str = "en") -> str:
+    code = state.upper()
+    if lang == "es" and code in STATE_NAMES_ES:
+        return STATE_NAMES_ES[code]
+    return STATE_NAMES.get(code, state)
+
+
+def what_happened(begin: date | None, end: date | None, lang: str = "en") -> str | None:
+    t = TEXT[lang]
     if begin and end and begin != end:
-        return f"This happened from {fmt_date(begin)} to {fmt_date(end)}."
+        return t["range"].format(begin=fmt_date(begin, lang), end=fmt_date(end, lang))
     if begin or end:
-        return f"This happened on {fmt_date(begin or end)}."
+        return t["on"].format(date=fmt_date(begin or end, lang))
     return None
 
 
-def format_declaration(state: str, d: Declaration) -> str:
+def status_line(d: Declaration, lang: str = "en") -> str:
+    """Can families apply for this declaration, and until when."""
+    t = TEXT[lang]
+    if d.ia_status == "open":
+        key = "open_today" if d.days_left == 0 else "open_one" if d.days_left == 1 else "open"
+        line = t[key].format(date=fmt_date(d.ia_deadline, lang), n=d.days_left)
+        if d.deadline_is_estimate:
+            line += " " + t["estimate"]
+        return line
+    if d.ia_status == "closed":
+        return t["closed"].format(date=fmt_date(d.ia_deadline, lang))
+    if d.public_assistance:
+        return t["pa_only"]
+    return t["none"]
+
+
+def format_declaration(state: str, d: Declaration, lang: str = "en") -> str:
     """Plain-language declaration block. Dates and codes stay exact for the fact check."""
-    name = STATE_NAMES.get(state.upper(), state)
-    lines = [f"{plain_title(d.title)} in {name} ({d.code})"]
-    happened = what_happened(d.incident_begin, d.incident_end)
+    t = TEXT[lang]
+    if lang == "es":
+        kind = INCIDENT_ES.get(d.incident_type, "Desastre")
+        lines = [f"{kind} en {state_name(state, lang)} ({d.code})", f"Nombre oficial de FEMA: {d.title}."]
+    else:
+        lines = [f"{plain_title(d.title)} in {state_name(state)} ({d.code})"]
+    happened = what_happened(d.incident_begin, d.incident_end, lang)
     if happened:
         lines.append(happened)
-    declared = DECLARED_LINE.get(d.declaration_type, "FEMA declared this on {date}.")
-    lines.append(declared.format(date=fmt_date(d.declaration_date)))
-    if d.ia_status == "open":
-        if d.days_left == 0:
-            line = f"You can apply until {fmt_date(d.ia_deadline)}. That is today."
-        else:
-            line = f"You can apply until {fmt_date(d.ia_deadline)}. You have {d.days_left} days left."
-        if d.deadline_is_estimate:
-            line += " This date is an estimate. FEMA usually gives 60 days, and it has not published an official date."
-        lines.append(line)
-    elif d.ia_status == "closed":
-        lines.append(f"The last day to apply was {fmt_date(d.ia_deadline)}. That date has passed.")
-    elif d.public_assistance:
-        lines.append("This money goes to local government, not to families.")
-    else:
-        lines.append("This does not include help for families.")
+    declared = t["declared"].get(d.declaration_type, t["declared_other"])
+    lines.append(declared.format(date=fmt_date(d.declaration_date, lang)))
+    lines.append(status_line(d, lang))
     return "\n".join(lines)
 
 
-def no_llm_answer(report: CountyReport) -> str | None:
+def no_llm_answer(report: CountyReport, lang: str = "en") -> str | None:
     """Answers that need no AI. Returns None when the AI should explain."""
+    t = TEXT[lang]
     if report.ambiguous_areas:
         names = [friendly(a) for a in report.ambiguous_areas]
-        return (f"\"{report.county_query}\" could be more than one place in {report.state}: "
-                f"{' or '.join(names)}. Please name one, for example \"{names[0]}\".")
+        return t["ambiguous"].format(query=report.county_query, state=report.state,
+                                     names=t["or"].join(names), first=names[0])
     if not report.declarations:
         years = round(report.lookback_days / 365)
-        return (f"No FEMA disaster was found for {report.county_query}, {report.state} "
-                f"in the last {years} years. Help for families is not open there right now. "
-                f"If your home was damaged recently, check {APPLY_URL} or call {FEMA_HELPLINE}. "
-                f"A new disaster can be added at any time.")
+        return t["no_decl"].format(query=report.county_query, state=report.state, years=years)
     return None
 
 
@@ -125,17 +240,17 @@ class TemplateExplainer:
 
     model = "template-baseline"
 
-    def explain(self, report: CountyReport) -> Explanation:
-        fixed = no_llm_answer(report)
+    def explain(self, report: CountyReport, lang: str = "en") -> Explanation:
+        lang = check_lang(lang)
+        fixed = no_llm_answer(report, lang)
         if fixed:
             return Explanation(fixed, "rule")
-        if report.open_ia:
-            lead = f"Yes. Families in {report.county_name} can apply for FEMA help now."
-        else:
-            lead = f"No. FEMA help for families in {report.county_name} is not open right now."
-        blocks = [lead, *(format_declaration(report.state, d) for d in report.declarations)]
-        blocks.append(f"To apply, or to check your date, go to {APPLY_URL} or call {FEMA_HELPLINE}.")
+        t = TEXT[lang]
+        lead = (t["yes"] if report.open_ia else t["no"]).format(county=report.county_name)
+        blocks = [lead, *(format_declaration(report.state, d, lang) for d in report.declarations)]
+        blocks.append(t["end"])
         return Explanation("\n\n".join(blocks), self.model)
+
 
 
 def _ssl_context() -> ssl.SSLContext:
@@ -174,15 +289,16 @@ class ClaudeExplainer:
                 message = body
             raise RuntimeError(f"Anthropic API error {err.code} (model={self.model}): {message}") from None
 
-    def explain(self, report: CountyReport) -> Explanation:
-        fixed = no_llm_answer(report)
+    def explain(self, report: CountyReport, lang: str = "en") -> Explanation:
+        lang = check_lang(lang)
+        fixed = no_llm_answer(report, lang)
         if fixed:  # Saves a model call and removes any chance of a made-up answer.
             return Explanation(fixed, "rule")
         facts = json.dumps(report.to_payload(), separators=(",", ":"))
         data = self._post({
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "system": SYSTEM_PROMPT,
+            "system": SYSTEM_PROMPT + (SPANISH_RULES if lang == "es" else ""),
             "messages": [{"role": "user", "content": f"Facts:\n{facts}"}],
         })
         text = "".join(b.get("text", "") for b in data.get("content", [])).strip()

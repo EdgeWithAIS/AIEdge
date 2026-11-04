@@ -228,11 +228,60 @@
       font-size: 0.84rem;
     }
     a { color: var(--teal); }
+    [hidden] { display: none !important; }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: end;
+      gap: 0.6rem 1rem;
+      margin-bottom: 0.7rem;
+    }
+    .seg { display: flex; gap: 0.35rem; margin: 0; padding: 0; border: 0; }
+    .seg legend { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem; padding: 0; }
+    .seg label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid #b7c9ce;
+      border-radius: 999px;
+      color: var(--teal);
+      cursor: pointer;
+    }
+    .seg label:has(input:checked) { background: var(--teal); color: white; border-color: var(--teal); }
+    .seg input { position: absolute; opacity: 0; pointer-events: none; }
+    .seg label:has(input:focus-visible) { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .lang { flex-direction: row; align-items: center; gap: 0.5rem; }
+    .lang select { width: auto; padding: 0.35rem 0.5rem; font-size: 0.92rem; }
+    .composer.place { grid-template-columns: 1fr auto; }
+    details.help {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 0.7rem;
+    }
+    details.help summary { font-weight: 700; cursor: pointer; color: var(--teal); }
+    details.help p, details.help li { font-size: 0.95rem; }
+    details.help h3 { font-size: 0.95rem; margin: 0.8rem 0 0.2rem; }
+    .checklist { list-style: none; padding: 0; margin: 0.55rem 0 0; }
+    .checklist li { margin: 0.35rem 0; }
+    .checklist label {
+      display: flex;
+      gap: 0.55rem;
+      align-items: flex-start;
+      font-size: 0.95rem;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .checklist input { width: auto; margin-top: 0.25rem; flex: none; }
+    .checklist input:checked + span { color: var(--muted); text-decoration: line-through; }
+    .located { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
     @media (max-width: 700px) {
       h1 { font-size: 1.6rem; }
       .wrap { padding: 0.8rem 0.9rem 0.55rem; }
       .mode { margin-top: 0.55rem; }
-      .composer { grid-template-columns: 1fr; }
+      .composer, .composer.place { grid-template-columns: 1fr; }
       button[type="submit"] { width: 100%; }
     }
   </style>
@@ -249,7 +298,21 @@
       <h2 class="sr">Conversation</h2>
       <ol id="transcript" aria-live="polite"></ol>
       <form id="ask">
-        <div class="composer">
+        <div class="options">
+          <fieldset class="seg">
+            <legend>Search by</legend>
+            <label><input type="radio" name="by" value="county" checked> County</label>
+            <label><input type="radio" name="by" value="place"> ZIP code or address</label>
+          </fieldset>
+          <div class="field lang">
+            <label for="lang">Answer language</label>
+            <select id="lang">
+              <option value="en">English</option>
+              <option value="es" lang="es">Español</option>
+            </select>
+          </div>
+        </div>
+        <div class="composer" id="by-county">
           <div class="field">
             <label for="state">State</label>
             <select id="state" name="state" required></select>
@@ -262,6 +325,14 @@
           <button type="submit">Check this county</button>
           <p id="area-hint" class="hint"></p>
         </div>
+        <div class="composer place" id="by-place" hidden>
+          <div class="field">
+            <label for="place">ZIP code or street address</label>
+            <input id="place" name="place" placeholder="77002, or 1001 Avenida de las Americas, Houston, TX" maxlength="200" required disabled autocomplete="street-address">
+          </div>
+          <button type="submit" disabled>Check this place</button>
+          <p class="hint">Your ZIP code or address goes to the U.S. Census Bureau to find your county. This app does not save it.</p>
+        </div>
       </form>
       <p class="fine">Confirm at <a href="https://www.disasterassistance.gov">DisasterAssistance.gov</a> or <a href="tel:18006213362">1-800-621-3362</a>. Deadlines are calculated from FEMA’s declaration data, then checked before they are shown.</p>
     </main>
@@ -272,13 +343,59 @@
     const form = document.querySelector("#ask");
     const stateEl = document.querySelector("#state");
     const countyEl = document.querySelector("#county");
+    const placeEl = document.querySelector("#place");
+    const langEl = document.querySelector("#lang");
     const areaList = document.querySelector("#area-list");
     const hint = document.querySelector("#area-hint");
     const modeEl = document.querySelector("#mode");
-    const submitBtn = form.querySelector("button[type=submit]");
+    const groups = { county: document.querySelector("#by-county"), place: document.querySelector("#by-place") };
     const names = new Map();
     let busy = false;
     let areaToken = 0;
+
+    const UI = {
+      en: {
+        locale: "en-US",
+        askCounty: (place, state) => `Can families in ${place}, ${state} get FEMA help?`,
+        askPlace: (place) => `Can families at ${place} get FEMA help?`,
+        checking: (place, state) => `Checking declarations for ${place}, ${state}…`,
+        finding: (place) => `Finding the county for ${place}…`,
+        open: "Open", closed: "Closed", na: "Not for families",
+        types: { "Major Disaster": "Major Disaster", "Emergency": "Emergency", "Fire Management": "Fire Management" },
+        declared: (when) => `declared ${when}`,
+        link: "Declaration on FEMA.gov",
+        warn: "This answer failed the fact check. Do not use it to decide a deadline. Confirm at DisasterAssistance.gov or 1-800-621-3362.",
+        passed: "Fact check passed. Every date in this answer is in the declaration data.",
+        failed: "Fact check failed.",
+        refreshed: (when) => ` FEMA data refreshed ${when}.`,
+        checkFailed: "The check failed.",
+        unreachable: "Could not reach the app. Keep the terminal that started it open, then try again.",
+        denialButton: "FEMA said no to me",
+        matched: (address) => `Matched address: ${address}`,
+      },
+      es: {
+        locale: "es-US",
+        askCounty: (place, state) => `¿Pueden las familias de ${place}, ${state} recibir ayuda de FEMA?`,
+        askPlace: (place) => `¿Pueden las familias en ${place} recibir ayuda de FEMA?`,
+        checking: (place, state) => `Revisando las declaraciones de ${place}, ${state}…`,
+        finding: (place) => `Buscando el condado de ${place}…`,
+        open: "Abierta", closed: "Cerrada", na: "No es para familias",
+        types: { "Major Disaster": "Desastre mayor", "Emergency": "Emergencia", "Fire Management": "Incendio" },
+        declared: (when) => `declarado el ${when}`,
+        link: "Declaración en FEMA.gov (en inglés)",
+        warn: "Esta respuesta no pasó la revisión de datos. No la use para decidir una fecha límite. Confirme en DisasterAssistance.gov o al 1-800-621-3362.",
+        passed: "Revisión de datos aprobada. Cada fecha de esta respuesta está en los datos de la declaración.",
+        failed: "La revisión de datos falló.",
+        refreshed: (when) => ` Datos de FEMA actualizados el ${when}.`,
+        checkFailed: "La búsqueda falló.",
+        unreachable: "No se pudo conectar con la aplicación. Deje abierta la terminal que la inició y vuelva a intentarlo.",
+        denialButton: "FEMA me dijo que no",
+        matched: (address) => `Dirección encontrada: ${address}`,
+      },
+    };
+
+    function lang() { return langEl.value === "es" ? "es" : "en"; }
+    function ui(code) { return UI[code] || UI.en; }
 
     function el(tag, className, text) {
       const node = document.createElement(tag);
@@ -287,11 +404,11 @@
       return node;
     }
 
-    function fmtDate(iso) {
+    function fmtDate(iso, code = "en") {
       const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || "");
       if (!match) return iso || "";
       const when = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-      return when.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      return when.toLocaleDateString(ui(code).locale, { month: "long", day: "numeric", year: "numeric" });
     }
 
     function addUser(message) {
@@ -301,50 +418,37 @@
       item.scrollIntoView({ block: "nearest" });
     }
 
-    function addAssistant(node) {
+    function addAssistant(node, code) {
       const item = el("li", "assistant");
+      if (code) item.lang = code;
       item.append(node);
       transcript.append(item);
       item.scrollIntoView({ block: "nearest" });
       return item;
     }
 
-    function pill(status) {
-      if (status === "open") return el("span", "pill open", "Open");
-      if (status === "closed") return el("span", "pill closed", "Closed");
-      return el("span", "pill na", "Not for families");
+    function pill(status, t) {
+      if (status === "open") return el("span", "pill open", t.open);
+      if (status === "closed") return el("span", "pill closed", t.closed);
+      return el("span", "pill na", t.na);
     }
 
-    function deadlineLine(row) {
-      if (row.ia_status === "open" && row.ia_deadline) {
-        const left = row.days_left === 0 ? "That is today." : `You have ${row.days_left} days left.`;
-        const estimate = row.deadline_is_estimate
-          ? " This date is an estimate. FEMA has not published an official date."
-          : "";
-        return `You can apply until ${fmtDate(row.ia_deadline)}. ${left}${estimate}`;
-      }
-      if (row.ia_status === "closed" && row.ia_deadline) {
-        return `The last day to apply was ${fmtDate(row.ia_deadline)}. That date has passed.`;
-      }
-      if (row.public_assistance && !row.individual_assistance) {
-        return "This money goes to local government, not to families.";
-      }
-      return "This does not include help for families.";
-    }
-
-    function renderCard(row) {
+    function renderCard(row, code) {
+      const t = ui(code);
       const card = el("article", "decl");
       const top = el("div", "decl-top");
       top.append(el("span", "code", row.code || "Declaration"));
-      top.append(pill(row.ia_status));
+      top.append(pill(row.ia_status, t));
       card.append(top);
       if (row.title) card.append(el("p", "title", row.title));
-      const bits = [row.declaration_type, row.incident_type].filter(Boolean);
-      if (row.declaration_date) bits.push(`declared ${fmtDate(row.declaration_date)}`);
-      if (bits.length) card.append(el("p", "sub", bits.join(" · ")));
-      card.append(el("p", "deadline", deadlineLine(row)));
+      const bits = [t.types[row.declaration_type] || row.declaration_type];
+      if (code === "en") bits.push(row.incident_type);
+      if (row.declaration_date) bits.push(t.declared(fmtDate(row.declaration_date, code)));
+      const shown = bits.filter(Boolean);
+      if (shown.length) card.append(el("p", "sub", shown.join(" · ")));
+      if (row.status_line) card.append(el("p", "deadline", row.status_line));
       if (typeof row.url === "string" && row.url.startsWith("https://www.fema.gov/")) {
-        const link = el("a", null, "Declaration on FEMA.gov");
+        const link = el("a", null, t.link);
         link.href = row.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
@@ -355,68 +459,174 @@
       return card;
     }
 
+    function renderSteps(block) {
+      const box = el("details", "help");
+      box.open = true;
+      box.append(el("summary", null, block.title));
+      const list = el("ul", "checklist");
+      for (const item of block.items || []) {
+        const label = el("label");
+        const tick = el("input");
+        tick.type = "checkbox";
+        label.append(tick, el("span", null, item));
+        const li = el("li");
+        li.append(label);
+        list.append(li);
+      }
+      box.append(list);
+      return box;
+    }
+
+    function renderDenial(help, open = false) {
+      const box = el("details", "help");
+      box.open = open;
+      box.append(el("summary", null, help.title));
+      box.append(el("p", null, help.intro));
+      const steps = el("ol");
+      for (const step of help.steps || []) steps.append(el("li", null, step));
+      box.append(steps);
+      box.append(el("h3", null, help.reasons_title));
+      const reasons = el("ul");
+      for (const reason of help.reasons || []) reasons.append(el("li", null, reason));
+      box.append(reasons);
+      box.append(el("p", null, help.legal));
+      return box;
+    }
+
+    function choiceButtons(items, onPick) {
+      const choices = el("div", "choices");
+      for (const item of items) {
+        const button = el("button", null, item.label);
+        button.type = "button";
+        button.addEventListener("click", () => onPick(item));
+        choices.append(button);
+      }
+      return choices;
+    }
+
+    function pickCounty(state, county) {
+      setMode("county");
+      if (stateEl.value !== state) {
+        stateEl.value = state;
+        loadAreas(state);
+      }
+      countyEl.value = county;
+      ask({ state, county });
+    }
+
     function renderAnswer(data) {
+      const code = data.lang === "es" ? "es" : "en";
+      const t = ui(code);
       const wrap = el("div");
+      const located = data.located;
+      if (located && data.located_text) {
+        const line = located.matched_address
+          ? `${data.located_text} ${t.matched(located.matched_address)}`
+          : data.located_text;
+        wrap.append(el("p", "located", line));
+      }
       if (!data.grounding_ok) {
-        wrap.append(el("p", "warn", "This answer failed the fact check. Do not use it to decide a deadline. Confirm at DisasterAssistance.gov or 1-800-621-3362."));
+        wrap.append(el("p", "warn", t.warn));
         const list = el("ul", "problems");
         for (const problem of data.problems || []) list.append(el("li", null, problem));
         wrap.append(list);
       }
       wrap.append(el("p", "answer", data.text));
-      if (data.ambiguous_areas && data.ambiguous_areas.length) {
-        const choices = el("div", "choices");
-        for (const name of data.ambiguous_areas) {
-          const button = el("button", null, name);
-          button.type = "button";
-          button.addEventListener("click", () => {
-            countyEl.value = name;
-            ask(stateEl.value, name);
-          });
-          choices.append(button);
-        }
-        wrap.append(choices);
+      if (located && located.choices && located.choices.length > 1) {
+        wrap.append(choiceButtons(located.choices, (c) => pickCounty(c.state, c.county)));
       }
-      for (const row of data.declarations || []) wrap.append(renderCard(row));
-      const refreshed = data.data_refreshed ? ` FEMA data refreshed ${fmtDate(data.data_refreshed)}.` : "";
-      const fact = data.grounding_ok
-        ? `Fact check passed. Every date in this answer is in the declaration data.${refreshed}`
-        : `Fact check failed.${refreshed}`;
-      wrap.append(el("p", "meta", fact));
+      if (data.ambiguous_areas && data.ambiguous_areas.length) {
+        const state = data.state;
+        wrap.append(choiceButtons(data.ambiguous_areas.map((name) => ({ label: name })),
+          (c) => pickCounty(state, c.label)));
+      }
+      for (const row of data.declarations || []) wrap.append(renderCard(row, code));
+      if (data.next_steps) wrap.append(renderSteps(data.next_steps));
+      if (data.denial_help) wrap.append(renderDenial(data.denial_help));
+      if (!located || !located.choices || located.choices.length < 2) {
+        const refreshed = data.data_refreshed ? t.refreshed(fmtDate(data.data_refreshed, code)) : "";
+        wrap.append(el("p", "meta", (data.grounding_ok ? t.passed : t.failed) + refreshed));
+      }
       return wrap;
     }
 
     function setBusy(on) {
       busy = on;
-      submitBtn.disabled = on;
-      submitBtn.textContent = on ? "Checking…" : "Check this county";
+      for (const button of form.querySelectorAll("button[type=submit]")) {
+        button.textContent = on
+          ? "Checking…"
+          : button.closest("#by-place") ? "Check this place" : "Check this county";
+      }
+      syncDisabled();
     }
 
-    async function ask(state, county) {
-      const place = county.trim();
-      if (busy || !state || !place) return;
-      const stateName = names.get(state) || state;
-      addUser(`Can families in ${place}, ${stateName} get FEMA help?`);
-      const pending = addAssistant(el("p", "pending", `Checking declarations for ${place}, ${stateName}…`));
+    function mode() {
+      return form.querySelector("input[name=by]:checked").value;
+    }
+
+    function syncDisabled() {
+      for (const [name, group] of Object.entries(groups)) {
+        const off = name !== mode();
+        group.hidden = off;
+        for (const control of group.querySelectorAll("input, select")) control.disabled = off;
+        for (const button of group.querySelectorAll("button")) button.disabled = off || busy;
+      }
+    }
+
+    function setMode(name) {
+      form.querySelector(`input[name=by][value=${name}]`).checked = true;
+      syncDisabled();
+    }
+
+    async function ask(query) {
+      if (busy) return;
+      const code = lang();
+      const t = ui(code);
+      let pendingText;
+      if (query.place !== undefined) {
+        query.place = query.place.trim();
+        if (!query.place) return;
+        addUser(t.askPlace(query.place));
+        pendingText = t.finding(query.place);
+      } else {
+        query.county = query.county.trim();
+        if (!query.state || !query.county) return;
+        const stateName = names.get(query.state) || query.state;
+        addUser(t.askCounty(query.county, stateName));
+        pendingText = t.checking(query.county, stateName);
+      }
+      const pending = addAssistant(el("p", "pending", pendingText), code);
       setBusy(true);
       try {
         const response = await fetch("/api/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ state, county: place }),
+          body: JSON.stringify({ ...query, lang: code }),
         });
         const data = await response.json();
         pending.remove();
         if (!response.ok) {
-          addAssistant(el("p", "answer", data.error || "The check failed."));
+          addAssistant(el("p", "answer", data.error || t.checkFailed), code);
           return;
         }
-        addAssistant(renderAnswer(data));
+        addAssistant(renderAnswer(data), code);
       } catch (err) {
         pending.remove();
-        addAssistant(el("p", "answer", "Could not reach the app. Keep the terminal that started it open, then try again."));
+        addAssistant(el("p", "answer", t.unreachable), code);
       } finally {
         setBusy(false);
+      }
+    }
+
+    async function showDenialHelp() {
+      const code = lang();
+      try {
+        const response = await fetch("/api/help?lang=" + code);
+        const help = await response.json();
+        addUser(ui(code).denialButton);
+        addAssistant(renderDenial(help, true), code);
+      } catch (err) {
+        addAssistant(el("p", "answer", ui(code).unreachable), code);
       }
     }
 
@@ -471,25 +681,43 @@
       for (const [state, county, label] of samples) {
         const button = el("button", null, label);
         button.type = "button";
-        button.addEventListener("click", () => {
-          stateEl.value = state;
-          countyEl.value = county;
-          loadAreas(state);
-          ask(state, county);
-        });
+        button.addEventListener("click", () => pickCounty(state, county));
         host.append(button);
       }
+      const zip = el("button", null, "ZIP code 63026");
+      zip.type = "button";
+      zip.addEventListener("click", () => {
+        setMode("place");
+        placeEl.value = "63026";
+        ask({ place: "63026" });
+      });
+      host.append(zip);
+      const denied = el("button", null, "FEMA said no to me · FEMA me dijo que no");
+      denied.type = "button";
+      denied.addEventListener("click", showDenialHelp);
+      host.append(denied);
     }
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      ask(stateEl.value, countyEl.value);
+      if (mode() === "place") ask({ place: placeEl.value });
+      else ask({ state: stateEl.value, county: countyEl.value });
     });
+    for (const radio of form.querySelectorAll("input[name=by]")) {
+      radio.addEventListener("change", () => {
+        syncDisabled();
+        (mode() === "place" ? placeEl : countyEl).focus();
+      });
+    }
     stateEl.addEventListener("change", () => loadAreas(stateEl.value));
 
     async function init() {
+      syncDisabled();
       const greeting = el("div");
-      greeting.append(el("p", "answer", "Tell me a state and a county, parish, or city. I will check FEMA disasters from the last two years and tell you if families can apply, and the last day to apply."));
+      greeting.append(el("p", "answer", "Tell me a state and a county, parish, or city, or a ZIP code or street address. I will check FEMA disasters from the last two years and tell you if families can apply, and the last day to apply."));
+      const spanish = el("p", "answer", "¿Prefiere español? Elija «Español» en el idioma de la respuesta.");
+      spanish.lang = "es";
+      greeting.append(spanish);
       greeting.append(el("div", "choices", null));
       greeting.lastChild.id = "examples";
       addAssistant(greeting);

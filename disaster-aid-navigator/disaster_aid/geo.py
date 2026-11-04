@@ -12,6 +12,7 @@ from dataclasses import dataclass
 KIND_WORDS = {
     "county": "county", "parish": "parish", "borough": "borough",
     "city": "city", "independent city": "city", "census area": "census area",
+    "city and borough": "city and borough",
     "municipio": "municipio", "municipality": "municipality",
 }
 STATEWIDE = "statewide"
