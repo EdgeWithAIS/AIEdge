@@ -47,7 +47,7 @@ flowchart LR
 | Fetch | `disaster_aid/fema_client.py` | Queries OpenFEMA by FIPS state code and date window, only the 18 fields needed, with paging. No API key. |
 | Match | `disaster_aid/geo.py` | Maps "Saint Louis city" to `St. Louis (Independent City)`. Asks the user to choose when a name is ambiguous. Includes statewide declarations. |
 | Decide | `disaster_aid/status.py` | Merges duplicate rows, applies FEMA's rule that Individual Assistance = `ihProgramDeclared` or `iaProgramDeclared`, uses `lastIAFilingDate` for the deadline, and estimates FEMA's usual 60-day window, clearly flagged, when no date is published. |
-| Explain | `disaster_aid/explainer.py` | Claude rewrites the facts in plain English, 120 words max. An offline template does the same without an API key. |
+| Explain | `disaster_aid/explainer.py` | Claude rewrites the facts in plain English, one short block per declaration. There is no fixed word limit: an answer is about 35 words plus 25–40 per declaration, so a county with many declarations gets a longer answer (Spanish runs longer still). An offline template does the same without an API key. |
 | Verify | `disaster_aid/grounding.py` | Every date, declaration code and "N days" count in the answer must appear in the facts. Open deadlines must be stated, and estimates must be called estimates. |
 
 ## Results (offline baseline)
@@ -65,7 +65,7 @@ The grounding checker has its own tests that feed it **deliberately wrong answer
 
 ## Cost
 
-Each AI call sends about 1,100 characters of facts, a few hundred tokens, and gets back a short answer. Counties with no declarations, or with an ambiguous name, get a rule-based answer with **no AI call**. A full eval run costs a few cents.
+Each AI call uses about 1,000–2,500 input tokens and 500–2,000 output tokens on `claude-haiku-5-5`, most of the output being the model's thinking. That is about $0.001 per question (measured on 10 live questions, November 2026). Counties with no declarations, or with an ambiguous name, get a rule-based answer with **no AI call**. A full eval run costs a few cents.
 
 ## Run it
 
