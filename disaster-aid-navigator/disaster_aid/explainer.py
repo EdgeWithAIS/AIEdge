@@ -103,7 +103,7 @@ class ClaudeExplainer:
 
     API_URL = "https://api.anthropic.com/v1/messages"
 
-    def __init__(self, model: str | None = None, api_key: str | None = None, max_tokens: int = 300):
+    def __init__(self, model: str | None = None, api_key: str | None = None, max_tokens: int = 3000):
         self.model = model or os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not self.api_key:
