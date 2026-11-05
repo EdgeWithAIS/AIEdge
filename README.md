@@ -59,39 +59,6 @@ Each AI call uses about 1,000–2,500 input tokens and 500–2,000 output tokens
 
 ## Run it
 
-Python 3.10+ and no required packages.
-
-```bash
-# Offline: synthetic fixtures, no network, no key
-python3 -m disaster_aid.cli MO "St. Louis County" --offline --fixtures fixtures/declarations.json --as-of 2026-11-03
-
-# Live FEMA data, template answer
-python3 -m disaster_aid.cli TX "Harris County" --offline
-
-# Live FEMA data, Claude answer
-export ANTHROPIC_API_KEY="sk-ant-..."
-python3 -m disaster_aid.cli TX "Harris County"
-
-# ZIP code or street address instead of a county (free U.S. Census data, no key)
-python3 -m disaster_aid.cli --place 77002 --offline
-python3 -m disaster_aid.cli --place "1001 Avenida de las Americas, Houston, TX 77010" --offline
-
-# Spanish answer, plus the "what to do next" checklist
-python3 -m disaster_aid.cli TX "Harris County" --offline --lang es --steps
-
-# How to appeal a FEMA "no" letter (add --lang es for Spanish)
-python3 -m disaster_aid.cli --denied
-
-# Web page, same as the offline command above: live FEMA data, template answer
-python3 -m disaster_aid.web
-
-# Tests and evals
-python3 -m pytest -q
-python3 evals/run_evals.py --offline
-python3 evals/run_evals.py           # with Claude
-```
-
-On macOS, if you see `CERTIFICATE_VERIFY_FAILED`, run `python3 -m pip install --user certifi`.
 
 ## Design trade-offs
 
