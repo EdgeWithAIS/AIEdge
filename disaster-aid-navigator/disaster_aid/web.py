@@ -20,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from .explainer import TemplateExplainer, default_explainer, state_name, status_line
+from .explainer import TemplateExplainer, declaration_heading, default_explainer, state_name, status_line
 from .fema_client import STATE_FIPS, STATE_NAMES, FemaClient, FixtureClient
 from .geo import friendly, is_statewide
 from .grounding import check_answer
@@ -85,6 +85,8 @@ def answer_county(state: str, county: str, *, client, explainer, as_of: date | N
     problems = check_answer(answer.text, payload)
     for row, decl in zip(payload["declarations"], report.declarations):
         row["status_line"] = status_line(decl, lang)
+        # FEMA titles are English; Spanish cards show a Spanish heading instead.
+        row["heading"] = declaration_heading(report.state, decl, lang) if lang == "es" else row.get("title")
     found = bool(report.declarations) and not report.ambiguous_areas
     return {
         "lang": lang,

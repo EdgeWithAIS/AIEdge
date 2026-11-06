@@ -529,7 +529,8 @@
       top.append(el("span", "code", row.code || "Declaration"));
       top.append(pill(row.ia_status, t));
       card.append(top);
-      if (row.title) card.append(el("p", "title", row.title));
+      const heading = row.heading || row.title;
+      if (heading) card.append(el("p", "title", heading));
       const bits = [t.types[row.declaration_type] || row.declaration_type];
       if (code === "en") bits.push(row.incident_type);
       if (row.declaration_date) bits.push(t.declared(fmtDate(row.declaration_date, code)));

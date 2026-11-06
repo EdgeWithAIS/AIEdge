@@ -70,6 +70,26 @@ def test_spanish_estimate_is_flagged(client):
     assert "Esta fecha es estimada" in text
 
 
+@pytest.mark.parametrize("state,county", [("KY", "Pike"), ("MO", "St. Louis County"), ("LA", "Orleans Parish")])
+def test_spanish_answer_has_no_english(client, state, county):
+    """One language per answer: FEMA's English titles never appear in a Spanish answer or card."""
+    from disaster_aid.web import answer_county
+    r = report(client, state, county)
+    data = answer_county(state, county, client=client, explainer=TemplateExplainer(), as_of=TODAY, lang="es")
+    assert r.declarations
+    for d in r.declarations:
+        assert d.title not in data["text"]
+    assert "Nombre oficial" not in data["text"]
+    for row in data["declarations"]:
+        assert row["heading"] != row["title"] and " en " in row["heading"]
+
+
+def test_each_prompt_names_one_language():
+    from disaster_aid.explainer import ENGLISH_RULES, SPANISH_RULES
+    assert "English only" in ENGLISH_RULES
+    assert "Write only in Spanish" in SPANISH_RULES and "Nombre oficial" not in SPANISH_RULES
+
+
 def test_checker_catches_a_wrong_spanish_date(client):
     r = report(client, "MO", "St. Louis County")
     text = TemplateExplainer().explain(r, "es").text

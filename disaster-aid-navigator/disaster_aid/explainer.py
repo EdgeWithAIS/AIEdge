@@ -49,13 +49,20 @@ Rules:
 - If the only program is Public Assistance: "This money goes to local government, not to families."
 End with: To apply, or to check your date, go to {APPLY_URL} or call {FEMA_HELPLINE}."""
 
+# One language per answer: the rules for the chosen language go last.
+ENGLISH_RULES = """
+
+LANGUAGE: Write the whole answer in English only. Do not add Spanish or any other language."""
+
 SPANISH_RULES = f"""
 
 LANGUAGE: Write the whole answer in simple Spanish (español sencillo), using "usted".
-Keep declaration codes exactly as they are. Write every date like "22 de julio de 2025".
+Write only in Spanish. Do not copy FEMA's English title or any other English words, and do not repeat anything in English.
+Only declaration codes, the web address and the phone number stay exactly as they are.
+Write every date like "22 de julio de 2025".
 Use these sentences in place of the English ones:
 - First sentence: "Sí. Las familias de {{county}} pueden pedir ayuda de FEMA ahora." or "No. La ayuda de FEMA para familias de {{county}} no está abierta ahora."
-- Block first line: the kind of disaster in Spanish, "en" the state name in Spanish, then the code. Example: "Tormentas fuertes en Misuri (DR-4885-MO)". Then: "Nombre oficial de FEMA: {{title}}."
+- Block first line: the kind of disaster in Spanish (from incident_type), "en" the state name in Spanish, then the code. Example: "Tormentas fuertes en Misuri (DR-4885-MO)".
 - "Esto pasó del {{begin}} al {{end}}." or "Esto pasó el {{date}}."
 - "FEMA declaró un desastre mayor el {{date}}." / "FEMA declaró una emergencia el {{date}}." / "FEMA declaró ayuda por un incendio el {{date}}."
 - "Puede pedir ayuda hasta el {{date}}. Le quedan {{days_left}} días." or, when days_left is 0, "Puede pedir ayuda hasta el {{date}}. Hoy es el último día."
@@ -205,14 +212,17 @@ def status_line(d: Declaration, lang: str = "en") -> str:
     return t["none"]
 
 
+def declaration_heading(state: str, d: Declaration, lang: str = "en") -> str:
+    """'Severe storms in Missouri' / 'Tormentas fuertes en Misuri'. Spanish never shows FEMA's English title."""
+    if lang == "es":
+        return f"{INCIDENT_ES.get(d.incident_type, 'Desastre')} en {state_name(state, lang)}"
+    return f"{plain_title(d.title)} in {state_name(state)}"
+
+
 def format_declaration(state: str, d: Declaration, lang: str = "en") -> str:
     """Plain-language declaration block. Dates and codes stay exact for the fact check."""
     t = TEXT[lang]
-    if lang == "es":
-        kind = INCIDENT_ES.get(d.incident_type, "Desastre")
-        lines = [f"{kind} en {state_name(state, lang)} ({d.code})", f"Nombre oficial de FEMA: {d.title}."]
-    else:
-        lines = [f"{plain_title(d.title)} in {state_name(state)} ({d.code})"]
+    lines = [f"{declaration_heading(state, d, lang)} ({d.code})"]
     happened = what_happened(d.incident_begin, d.incident_end, lang)
     if happened:
         lines.append(happened)
@@ -298,7 +308,7 @@ class ClaudeExplainer:
         data = self._post({
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "system": SYSTEM_PROMPT + (SPANISH_RULES if lang == "es" else ""),
+            "system": SYSTEM_PROMPT + (SPANISH_RULES if lang == "es" else ENGLISH_RULES),
             "messages": [{"role": "user", "content": f"Facts:\n{facts}"}],
         })
         text = "".join(b.get("text", "") for b in data.get("content", [])).strip()
