@@ -1,0 +1,8 @@
+Requirements meeting - Checkout redesign
+Attendees: Priya (Product), Mark (Finance), Dev team
+
+- Customers abandon cart because they must create an account. Want guest checkout.
+- Finance needs an order confirmation email with tax breakdown.
+- Mark: refunds over $500 need manager approval.
+- Support wants customers to see order status without calling.
+- Open: do we support Apple Pay in phase 1? Priya to confirm.

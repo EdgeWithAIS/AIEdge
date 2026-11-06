@@ -1,0 +1,29 @@
+MEETING TRANSCRIPT
+Title: Website Relaunch updates
+Date: Tuesday, October 15, 2026
+Duration: 10 minutes
+Attendees:
+  Sunil R – Product Manager (host)
+  Jeff A – Engineering Lead
+  Ashim B – QA Lead
+  Tracy B  – Product Designer
+  Jen S – Customer Support Lead
+  Leo K – Marketing Manager
+
+----------------------------------------------------------------------
+
+[00:00] Sunil: How is the work coming along for the website relaunch
+
+[00:01] Jeff: We are running a little behind. We will try to catch up this week. If not, you will be the first to know.
+
+[00:02] Leo: I saw the logo. it does not match the website colors
+
+[00:03] Jeff: Priya, can you create a new user story for the logo to be update based on whwat Tom / Leo is looking for
+
+[00:04] Tracy: I was thinking about doing white background and color in bluw that matches the website color scheme.
+
+[00:05] Jen: I like the new icon colors as I have heard some user filling out the form about how it looks now.
+
+[00:07] Ashim B: While we are at website changes topic, what do you think about updating the footer
+
+[00:08] Tracy: That is a good idea. Let's change to footer to show all the other names we have where we are doing business as (DBA)
