@@ -8,7 +8,7 @@ Disaster Aid Navigator helps people answer a stressful question:
 
 It combines public disaster data from 44 sources, official recovery guidance, and conversational AI in English and Spanish. The engineering principle is simple: **code calculates the facts; AI explains them; code checks the response.** It also helps people work through follow-up questions and build a sourced recovery plan.
 
-Sources: FEMA 10, USDA 9, IRS 6, SBA 5, HHS 4, DOL 2, ED 2, SAMHSA 2, HUD 2, VA 2
+44 Sources: FEMA 10, USDA 9, IRS 6, SBA 5, HHS 4, DOL 2, ED 2, SAMHSA 2, HUD 2, VA 2
 Live Sources: 
 1. Census Geocoder
 2. Census ZCTA
