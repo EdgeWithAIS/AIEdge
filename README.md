@@ -76,7 +76,7 @@ flowchart TD
 | **Amazon Aurora PostgreSQL Serverless v2 + pgvector** | Stores curated help-page passages and supports keyword and meaning-based search. The documented corpus contains 76 passages from 44 official pages in English and Spanish. |
 | **Voyage embeddings and reranking** | Support meaning-based retrieval and reorder search results so the most relevant passages reach the answer generator. |
 | **Amazon DynamoDB** | Shares usage counts, daily limits, and settings across app instances. The source reports a 180-day expiry for usage records. |
-| **Auth0** | Provides user sign-in and standard/admin roles. |
+| **Auth0** | Part of Okta it provides user sign-in and standard/admin roles. |
 | **AWS Secrets Manager and IAM database authentication** | Manage application secrets and use short-lived database access tokens rather than a stored database password. |
 | **Docker and offline continuous integration** | Package the app and check behavior using automated tests without depending on live external services. |
 
@@ -133,6 +133,6 @@ These are planned improvements, not current capabilities or commitments.
 
 ## Explore the implementation
 
-For setup, configuration, deployment, and detailed measurements, see the [technical guide](disaster-aid-navigator/TECHNICAL_GUIDE.md).
+Interested in live demo? [Reach out to me: ](https://edgewithais.com/contact/?your-interest=Live%20demo%20of%20Disaster%20Aid%20Navigator) 
 
 The deadline pipeline uses [OpenFEMA Disaster Declarations Summaries v2](https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2). Recovery guidance draws on curated public government help pages. Data availability, publication delays, and content freshness can affect the guidance provided; confirm important application decisions with the relevant agency.
