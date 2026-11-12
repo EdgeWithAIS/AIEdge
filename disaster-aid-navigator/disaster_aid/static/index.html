@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disaster Aid Navigator</title>
+  <link rel="stylesheet" href="/assets/app.css?v=ASSET_V">
+</head>
+<body>
+  <div class="wrap">
+    <nav id="userbar" class="userbar" aria-label="Your account"><!--USERBAR--></nav>
+    <header>
+      <p class="eyebrow">Not an official FEMA site</p>
+      <h1>Disaster Aid Navigator</h1>
+      <p class="lede">Can families in your county get FEMA help, and by what date?</p>
+      <ul class="features" aria-label="What this tool can do">
+        <li>Tells you if families can apply for FEMA help now, and the last day to apply</li>
+        <li>Ask in plain language, or with a ZIP code or street address</li>
+        <li>Ask in Spanish to get answers in Spanish</li>
+        <li>A "what to do next" checklist</li>
+        <li>Help to appeal if FEMA said no</li>
+        <li>Every date is checked against FEMA's own data</li>
+      </ul>
+      <p id="mode" class="mode" hidden></p>
+    </header>
+    <main>
+      <h2 class="sr">Conversation</h2>
+      <section class="suggest" aria-labelledby="suggest-title">
+        <p class="suggest-title" id="suggest-title">Try asking</p>
+        <div class="suggest-list" id="suggestions"></div>
+      </section>
+      <form id="ask" class="chat" aria-label="Ask a question">
+        <label class="chat-label" for="question">Type your question</label>
+        <div class="chat-box" id="question-box" tabindex="-1">
+          <div class="chat-thread">
+            <p class="disclaimer" id="box-disclaimer" role="note">
+              <strong>This tool uses AI, and AI can make mistakes.</strong>
+              Always confirm dates and eligibility with FEMA at
+              <a href="https://www.disasterassistance.gov">DisasterAssistance.gov</a>
+              or <a href="tel:18006213362">1-800-621-3362</a> before you act.
+              <span lang="es">Esta herramienta usa inteligencia artificial (IA), y la IA puede equivocarse. Confirme siempre las fechas con FEMA.</span>
+            </p>
+            <ol id="transcript" aria-live="polite"></ol>
+          </div>
+          <textarea id="question" name="question" rows="2" maxlength="400" required
+            placeholder="Can families in Harris County, TX get FEMA help? Or try a ZIP like 77002."></textarea>
+        </div>
+        <p class="hint">Include a county, parish, or city and the state — or a ZIP / street address. Ask in Spanish for a Spanish answer.<br>Enter to ask · Shift+Enter for a new line.</p>
+      </form>
+      <p class="fine">Confirm at <a href="https://www.disasterassistance.gov">DisasterAssistance.gov</a> or <a href="tel:18006213362">1-800-621-3362</a>. Deadlines are calculated from FEMA’s declaration data, then checked before they are shown.</p>
+    </main>
+  </div>
+  <noscript><p>This page needs JavaScript to ask about a county.</p></noscript>
+  <script src="/assets/app.js?v=ASSET_V"></script>
+</body>
+</html>

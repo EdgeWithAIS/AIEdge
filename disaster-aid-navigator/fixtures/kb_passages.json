@@ -1,0 +1,22 @@
+{
+  "_note": "Synthetic passages for tests only. Written for this repo, not copied from FEMA, and not a source of real guidance. DR codes match fixtures/declarations.json.",
+  "passages": [
+    {"id": "hotel#1", "lang": "en", "source_url": "https://example.test/hotel", "title": "Paying for a hotel after a disaster",
+     "body": "If your home is not safe to live in, FEMA may pay for a hotel or motel for a short time. This is called Transitional Sheltering Assistance. Ask about it when you apply."},
+    {"id": "renters#1", "lang": "en", "source_url": "https://example.test/renters", "title": "Help for renters",
+     "body": "Renters can apply for FEMA help too. FEMA may help pay rent somewhere else while you cannot live at home, and may help replace furniture, clothes and other belongings."},
+    {"id": "insurance#1", "lang": "en", "source_url": "https://example.test/insurance", "title": "Insurance comes first",
+     "body": "File a claim with your insurance company before you apply. FEMA cannot pay for losses your insurance already covers, but it may help with costs your policy does not cover."},
+    {"id": "inspection#1", "lang": "en", "source_url": "https://example.test/inspection", "title": "The home inspection",
+     "body": "After you apply, an inspector may call to look at the damage. Inspectors carry a FEMA photo ID badge. An inspector never asks for money."},
+    {"id": "appeal#1", "lang": "en", "source_url": "https://example.test/appeal", "title": "Appealing a decision",
+     "body": "If FEMA says no, read the letter to learn why. You can appeal in writing. Send a signed letter and papers that answer the reason in the letter."},
+    {"id": "dr9901-extension#1", "lang": "en", "source_url": "https://example.test/dr-9901-extension", "title": "Deadline extended for Missouri storms",
+     "published": "2026-11-01", "dr_codes": ["DR-9901-MO"],
+     "body": "The deadline to apply for help after the September storms (DR-9901-MO) has been extended. Survivors in the listed counties have more time to register."},
+    {"id": "hotel-es#1", "lang": "es", "source_url": "https://example.test/es/hotel", "title": "Pago de hotel después de un desastre",
+     "body": "Si su casa no es segura, FEMA puede pagar un hotel o motel por un tiempo corto. Pregunte por esta ayuda cuando solicite."},
+    {"id": "renters-es#1", "lang": "es", "source_url": "https://example.test/es/inquilinos", "title": "Ayuda para inquilinos",
+     "body": "Los inquilinos también pueden solicitar ayuda de FEMA para pagar alquiler en otro lugar y reemplazar muebles y ropa."}
+  ]
+}

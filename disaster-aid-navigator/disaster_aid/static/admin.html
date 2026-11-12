@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin · Disaster Aid Navigator</title>
+  <link rel="stylesheet" href="/assets/app.css?v=ASSET_V">
+</head>
+<body>
+  <div class="wrap admin-wrap">
+    <nav id="userbar" class="userbar" aria-label="Your account">
+      <a href="/">Back to the navigator</a>
+      <!--USERBAR-->
+    </nav>
+    <header>
+      <p class="eyebrow">Admin</p>
+      <h1>Disaster Aid Navigator</h1>
+      <p class="lede">Usage, cost, and settings. Manage users and roles in the Auth0 dashboard.</p>
+    </header>
+
+    <section class="admin-section" aria-labelledby="usage-title">
+      <h2 id="usage-title">Usage, last <span id="days">14</span> days</h2>
+      <div class="tiles" id="tiles"></div>
+      <p class="status-line" id="cost-note"></p>
+    </section>
+
+    <section class="admin-section" aria-labelledby="by-day-title">
+      <h2 id="by-day-title">By day (UTC)</h2>
+      <table class="data-table">
+        <thead><tr><th>Day</th><th class="num">Questions</th><th class="num">Claude answers</th><th class="num">Errors</th><th class="num">Input tokens</th><th class="num">Output tokens</th><th class="num">Cost</th></tr></thead>
+        <tbody id="by-day"></tbody>
+      </table>
+    </section>
+
+    <section class="admin-section" aria-labelledby="users-title">
+      <h2 id="users-title">Top users</h2>
+      <table class="data-table">
+        <thead><tr><th>User</th><th>Role</th><th class="num">Questions</th><th class="num">Tokens</th><th class="num">Cost</th></tr></thead>
+        <tbody id="users"></tbody>
+      </table>
+    </section>
+
+    <section class="admin-section" aria-labelledby="errors-title">
+      <h2 id="errors-title">Recent errors</h2>
+      <table class="data-table">
+        <thead><tr><th>When (UTC)</th><th>User</th><th>Kind</th><th>Error</th></tr></thead>
+        <tbody id="errors"></tbody>
+      </table>
+    </section>
+
+    <section class="admin-section" aria-labelledby="settings-title">
+      <h2 id="settings-title">Settings</h2>
+      <form id="settings" class="settings-form">
+        <label class="check"><input type="checkbox" id="claude_enabled"> Answer with Claude</label>
+        <p class="note" id="claude-note"></p>
+        <label class="check"><input type="checkbox" id="agent_enabled"> Agent mode for everyone (on by default)</label>
+        <p class="note" id="agent-note">Claude chooses which checks to run, combines deadlines with help pages, follows up across messages and writes recovery plans. Every fact is still checked in code. Answers take more Claude calls (about $0.0003–0.004 each). When this is off, or Claude is off, the chat uses the regular answers.</p>
+        <label>Claude model
+          <input type="text" id="model" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Daily question limit for standard users
+          <input type="number" id="daily_limit" min="0" max="10000" step="1">
+          <span class="note">Admins have no limit. 0 stops standard users from asking.</span>
+        </label>
+        <label>Input price, dollars per million tokens
+          <input type="number" id="price_input_per_mtok" min="0" max="1000" step="0.01">
+        </label>
+        <label>Output price, dollars per million tokens
+          <input type="number" id="price_output_per_mtok" min="0" max="1000" step="0.01">
+          <span class="note">Used only to estimate cost on this page.</span>
+        </label>
+        <button type="submit">Save settings</button>
+        <p class="status-line" id="save-status" role="status"></p>
+      </form>
+    </section>
+  </div>
+  <script src="/assets/admin.js?v=ASSET_V"></script>
+</body>
+</html>

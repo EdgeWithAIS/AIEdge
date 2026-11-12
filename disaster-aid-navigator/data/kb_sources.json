@@ -1,0 +1,363 @@
+{
+ "_note": "Sources for the knowledge base. Build passages with: python3 -m disaster_aid.kb_ingest build. Each source needs a unique id, url and lang (en or es). agency, topic and audience are for review and later filtering. Pages a script cannot download (fema.gov, dol.gov) can be saved from a browser and listed with \"file\": \"data/kb_saved/<name>.html\" next to their url.",
+ "sources": [
+  {
+   "id": "da-fema-ihp-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4471",
+   "lang": "en",
+   "agency": "FEMA",
+   "topic": "housing-and-other-needs",
+   "audience": "individual"
+  },
+  {
+   "id": "da-fema-ihp-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4471",
+   "lang": "es",
+   "agency": "FEMA",
+   "topic": "housing-and-other-needs",
+   "audience": "individual"
+  },
+  {
+   "id": "fema-sheltering-housing-en",
+   "url": "https://www.fema.gov/assistance/individual/sheltering-housing-options",
+   "lang": "en",
+   "file": "data/kb_saved/fema-sheltering-housing-en.html",
+   "title": "FEMA sheltering and housing help",
+   "agency": "FEMA",
+   "topic": "housing-and-other-needs",
+   "audience": "individual"
+  },
+  {
+   "id": "fema-sheltering-housing-es",
+   "url": "https://www.fema.gov/es/assistance/individual/sheltering-housing-options",
+   "lang": "es",
+   "file": "data/kb_saved/fema-sheltering-housing-es.html",
+   "title": "Ayuda de FEMA para alojamiento y vivienda",
+   "agency": "FEMA",
+   "topic": "housing-and-other-needs",
+   "audience": "individual"
+  },
+  {
+   "id": "da-fema-drc-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4627",
+   "lang": "en",
+   "agency": "FEMA",
+   "topic": "getting-help",
+   "audience": "individual"
+  },
+  {
+   "id": "da-fema-drc-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4627",
+   "lang": "es",
+   "agency": "FEMA",
+   "topic": "getting-help",
+   "audience": "individual"
+  },
+  {
+   "id": "da-sba-home-loans-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4477",
+   "lang": "en",
+   "agency": "SBA",
+   "topic": "sba-home-loans",
+   "audience": "individual"
+  },
+  {
+   "id": "da-sba-home-loans-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4477",
+   "lang": "es",
+   "agency": "SBA",
+   "topic": "sba-home-loans",
+   "audience": "individual"
+  },
+  {
+   "id": "da-unemployment-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4450",
+   "lang": "en",
+   "agency": "DOL",
+   "topic": "unemployment",
+   "audience": "individual"
+  },
+  {
+   "id": "da-unemployment-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4450",
+   "lang": "es",
+   "agency": "DOL",
+   "topic": "unemployment",
+   "audience": "individual"
+  },
+  {
+   "id": "da-food-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/5769",
+   "lang": "en",
+   "agency": "USDA",
+   "topic": "food",
+   "audience": "individual"
+  },
+  {
+   "id": "da-food-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/5769",
+   "lang": "es",
+   "agency": "USDA",
+   "topic": "food",
+   "audience": "individual"
+  },
+  {
+   "id": "da-families-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4467",
+   "lang": "en",
+   "agency": "HHS",
+   "topic": "families",
+   "audience": "individual"
+  },
+  {
+   "id": "da-families-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4467",
+   "lang": "es",
+   "agency": "HHS",
+   "topic": "families",
+   "audience": "individual"
+  },
+  {
+   "id": "da-older-adults-disabilities-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4505",
+   "lang": "en",
+   "agency": "HHS",
+   "topic": "older-adults-disabilities",
+   "audience": "individual"
+  },
+  {
+   "id": "da-older-adults-disabilities-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4505",
+   "lang": "es",
+   "agency": "HHS",
+   "topic": "older-adults-disabilities",
+   "audience": "individual"
+  },
+  {
+   "id": "da-students-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/5905",
+   "lang": "en",
+   "agency": "ED",
+   "topic": "students",
+   "audience": "individual"
+  },
+  {
+   "id": "da-students-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/5905",
+   "lang": "es",
+   "agency": "ED",
+   "topic": "students",
+   "audience": "individual"
+  },
+  {
+   "id": "da-legal-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4464",
+   "lang": "en",
+   "agency": "FEMA",
+   "topic": "legal",
+   "audience": "individual"
+  },
+  {
+   "id": "da-legal-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4464",
+   "lang": "es",
+   "agency": "FEMA",
+   "topic": "legal",
+   "audience": "individual"
+  },
+  {
+   "id": "da-mental-health-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4506",
+   "lang": "en",
+   "agency": "SAMHSA",
+   "topic": "mental-health",
+   "audience": "individual"
+  },
+  {
+   "id": "da-mental-health-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4506",
+   "lang": "es",
+   "agency": "SAMHSA",
+   "topic": "mental-health",
+   "audience": "individual"
+  },
+  {
+   "id": "da-flood-insurance-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4465",
+   "lang": "en",
+   "agency": "FEMA",
+   "topic": "flood-insurance",
+   "audience": "individual"
+  },
+  {
+   "id": "da-flood-insurance-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4465",
+   "lang": "es",
+   "agency": "FEMA",
+   "topic": "flood-insurance",
+   "audience": "individual"
+  },
+  {
+   "id": "da-hud-housing-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4469",
+   "lang": "en",
+   "agency": "HUD",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-hud-housing-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4469",
+   "lang": "es",
+   "agency": "HUD",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-rural-housing-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4459",
+   "lang": "en",
+   "agency": "USDA",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-rural-housing-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4459",
+   "lang": "es",
+   "agency": "USDA",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-va-housing-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/1507",
+   "lang": "en",
+   "agency": "VA",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-va-housing-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/1507",
+   "lang": "es",
+   "agency": "VA",
+   "topic": "housing",
+   "audience": "individual"
+  },
+  {
+   "id": "da-irs-relief-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4500",
+   "lang": "en",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "da-irs-relief-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4500",
+   "lang": "es",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "da-sba-business-loans-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4479",
+   "lang": "en",
+   "agency": "SBA",
+   "topic": "sba-business-loans",
+   "audience": "business"
+  },
+  {
+   "id": "da-sba-business-loans-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4479",
+   "lang": "es",
+   "agency": "SBA",
+   "topic": "sba-business-loans",
+   "audience": "business"
+  },
+  {
+   "id": "sba-disaster-loans-en",
+   "url": "https://www.sba.gov/disaster/",
+   "lang": "en",
+   "file": "data/kb_saved/sba-disaster-en.html",
+   "title": "SBA disaster loans",
+   "agency": "SBA",
+   "topic": "sba-loans",
+   "audience": "both"
+  },
+  {
+   "id": "da-usda-business-loans-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4721",
+   "lang": "en",
+   "agency": "USDA",
+   "topic": "business-loans",
+   "audience": "business"
+  },
+  {
+   "id": "da-usda-business-loans-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4721",
+   "lang": "es",
+   "agency": "USDA",
+   "topic": "business-loans",
+   "audience": "business"
+  },
+  {
+   "id": "da-farmers-ranchers-en",
+   "url": "https://www.disasterassistance.gov/get-assistance/forms-of-assistance/4451",
+   "lang": "en",
+   "agency": "USDA",
+   "topic": "farm",
+   "audience": "business"
+  },
+  {
+   "id": "da-farmers-ranchers-es",
+   "url": "https://www.disasterassistance.gov/es/obtener-asistencia/forma-de-asistencia/4451",
+   "lang": "es",
+   "agency": "USDA",
+   "topic": "farm",
+   "audience": "business"
+  },
+  {
+   "id": "irs-disaster-relief-en",
+   "url": "https://www.irs.gov/businesses/small-businesses-self-employed/disaster-assistance-and-emergency-relief-for-individuals-and-businesses",
+   "lang": "en",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "irs-disaster-relief-es",
+   "url": "https://www.irs.gov/es/businesses/small-businesses-self-employed/disaster-assistance-and-emergency-relief-for-individuals-and-businesses",
+   "lang": "es",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "irs-records-casualty-loss-en",
+   "url": "https://www.irs.gov/newsroom/reconstructing-records-after-a-natural-disaster-or-casualty-loss",
+   "lang": "en",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "irs-records-casualty-loss-es",
+   "url": "https://www.irs.gov/es/newsroom/reconstructing-records-after-a-natural-disaster-or-casualty-loss",
+   "lang": "es",
+   "agency": "IRS",
+   "topic": "tax",
+   "audience": "both"
+  },
+  {
+   "id": "fsa-emergency-loans-en",
+   "url": "https://www.fsa.usda.gov/resources/loans/emergency-farm-loans",
+   "lang": "en",
+   "agency": "USDA",
+   "topic": "farm",
+   "audience": "business"
+  }
+ ]
+}
