@@ -6,7 +6,13 @@ Disaster Aid Navigator helps people answer a stressful question:
 
 > “Can my household apply for FEMA disaster help, and by when?”
 
-It combines public disaster data, official recovery guidance, and conversational AI in English and Spanish. The engineering principle is simple: **code calculates the facts; AI explains them; code checks the response.** It also helps people work through follow-up questions and build a sourced recovery plan.
+It combines public disaster data from 44 sources, official recovery guidance, and conversational AI in English and Spanish. The engineering principle is simple: **code calculates the facts; AI explains them; code checks the response.** It also helps people work through follow-up questions and build a sourced recovery plan.
+
+Sources: FEMA 10, USDA 9, IRS 6, SBA 5, HHS 4, DOL 2, ED 2, SAMHSA 2, HUD 2, VA 2
+Live Sources: 
+1. Census Geocoder
+2. Census ZCTA
+3. OpenFEMA DisasterDeclarationsSummaries
 
 > This is an independent guidance tool, not a FEMA eligibility decision or a guarantee of assistance. Confirm application requirements and deadlines with [DisasterAssistance.gov](https://www.disasterassistance.gov). It is not endorsed by FEMA.
 
