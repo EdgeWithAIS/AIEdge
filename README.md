@@ -74,7 +74,7 @@ flowchart TD
 | **Claude via the Anthropic API** | Explains tool results, selects tools in agent mode, and drafts sourced recovery guidance. The source README identifies Haiku 5.5 as the application model. |
 | **Amazon ECS Express Mode on AWS Fargate** | Runs the containerized web app with managed compute, HTTPS, load balancing, health checks, and deployment support. |
 | **Amazon Aurora PostgreSQL Serverless v2 + pgvector** | Stores curated help-page passages and supports keyword and meaning-based search. The documented corpus contains 76 passages from 44 official pages in English and Spanish. |
-| **Voyage embeddings and reranking** | Support meaning-based retrieval and reorder search results so the most relevant passages reach the answer generator. |
+| **Voyage embeddings and reranking** | Support Hybrid approach meaning-based retrieval and reorder search results so the most relevant passages reach the answer generator. |
 | **Amazon DynamoDB** | Shares usage counts, daily limits, and settings across app instances. The source reports a 180-day expiry for usage records. |
 | **Auth0** | Part of Okta it provides user sign-in and standard/admin roles. |
 | **AWS Secrets Manager and IAM database authentication** | Manage application secrets and use short-lived database access tokens rather than a stored database password. |
