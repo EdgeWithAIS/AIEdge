@@ -1,6 +1,6 @@
 # Disaster Aid Navigator
 
-**Plain-language disaster recovery guidance, with FEMA application deadlines calculated in code and answers checked against their sources.**
+**It provides plain-language disaster recovery guidance, with FEMA application deadlines calculated in code and answers checked against their sources.**
 
 Disaster Aid Navigator helps people answer a stressful question:
 
